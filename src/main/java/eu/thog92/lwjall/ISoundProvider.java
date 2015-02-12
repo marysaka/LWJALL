@@ -13,7 +13,7 @@ public interface ISoundProvider
      * @param upY Y element of the up direction.
      * @param upZ Z element of the up direction.
      */
-    void setListenerOrientation( float lookX, float lookY, float lookZ, float upX, float upY, float upZ);
+    void setListenerOrientation(float lookX, float lookY, float lookZ, float upX, float upY, float upZ);
 
     void cleanUp();
 }

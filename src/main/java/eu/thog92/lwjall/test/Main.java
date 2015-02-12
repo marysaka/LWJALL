@@ -9,9 +9,6 @@ public class Main
     {
         ALSoundProvider soundProvider = new ALSoundProvider();
 
-
-
-
         soundProvider.cleanUp();
     }
 }

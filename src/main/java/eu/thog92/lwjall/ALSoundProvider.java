@@ -27,15 +27,15 @@ public class ALSoundProvider implements ISoundProvider
      */
     private FloatBuffer listenerVelocity = null;
 
-    private List<Channel> channels;
+    private List<IChannel> channels;
 
     private boolean supportPitch;
 
     public ALSoundProvider() throws LWJGLException
     {
-        String errorMessage = null;
+        System.out.println("Initializing LWJALL...");
         AL.create();
-        errorMessage = checkALError();
+        String errorMessage = checkALError();
         if(errorMessage != null)
         {
             throw new LWJGLException("OpenAL did not initialize properly: " + errorMessage);
@@ -71,14 +71,14 @@ public class ALSoundProvider implements ISoundProvider
             throw new LWJGLException("OpenAL did not initialize properly: " + errorMessage);
         }
 
-        channels = new ArrayList<Channel>();
+        channels = new ArrayList<IChannel>();
 
         // Init Channels
 
         //TODO: Find a real number of Channels
         for(int i = 0; i < 28; i++)
         {
-            Channel channel = createChannel();
+            NormalChannel channel = createNormalChannel();
             if(channel == null)
             {
                 break;
@@ -88,8 +88,8 @@ public class ALSoundProvider implements ISoundProvider
 
         // Pitch Check
 
-        Channel pitchTesting = channels.get(1);
-        AL10.alSourcef(pitchTesting.getFromALSource(0), AL10.AL_PITCH, 1.0f);
+        NormalChannel pitchTesting = (NormalChannel) channels.get(1);
+        AL10.alSourcef(pitchTesting.getSource(0), AL10.AL_PITCH, 1.0f);
         if(checkALError() != null)
         {
             this.supportPitch = false;
@@ -99,7 +99,7 @@ public class ALSoundProvider implements ISoundProvider
         {
             this.supportPitch = true;
         }
-
+        System.out.println("LWJALL is ready!");
     }
 
     private String checkALError()
@@ -123,31 +123,22 @@ public class ALSoundProvider implements ISoundProvider
         }
     }
 
-    private Channel createChannel()
+    private NormalChannel createNormalChannel()
     {
-        Channel channel;
         IntBuffer source;
 
         source = BufferUtils.createIntBuffer(1);
-        try
-        {
-            AL10.alGenSources(source);
-        }
-        catch(java.lang.Exception e)
-        {
-            AL10.alGetError();
-            return null;  // no more voices left
-        }
+        AL10.alGenSources(source);
 
         if(AL10.alGetError() != AL10.AL_NO_ERROR)
         {
             return null;
         }
 
-        channel = new Channel(source);
-        return channel;
+        return new NormalChannel(source);
     }
 
+    @Override
     public void setListenerLocation(float x, float y, float z)
     {
         listenerPosition.put(0, x);
@@ -173,6 +164,9 @@ public class ALSoundProvider implements ISoundProvider
     @Override
     public void cleanUp()
     {
+        System.out.println("LWALL shutting down...");
         AL.destroy();
+        System.out.println("OpenAL destroyed");
+
     }
 }
