@@ -170,6 +170,6 @@ public class NormalChannel implements IChannel
             default:
                 break;
         }
-        return (((float) AL10.alGetSourcei(source.get(0), AL11.AL_BYTE_OFFSET) / bytesPerFrame) / (float) sampleRate)  * 1000;
+        return (((float) AL10.alGetSourcei(source.get(0), AL11.AL_BYTE_OFFSET) / bytesPerFrame) / (float) sampleRate) * 1000;
     }
 }
