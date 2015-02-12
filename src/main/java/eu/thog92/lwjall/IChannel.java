@@ -1,29 +1,36 @@
 package eu.thog92.lwjall;
 
+import java.io.IOException;
+import java.net.URL;
+
 import javax.sound.sampled.AudioFormat;
 
 public interface IChannel
 {
 
-    int getSampleRate();
+	int getSampleRate();
 
-    void setSampleRate(int sampleRate);
+	void setSampleRate(int sampleRate);
 
-    int getSource(int index);
+	int getSource(int index);
 
-    void cleanup();
+	void cleanup();
 
-    void setAudioFormat(AudioFormat audioFormat);
+	void setAudioFormat(AudioFormat audioFormat);
 
-    void play();
+	void play();
 
-    void pause();
+	void pause();
 
-    void stop();
+	void stop();
 
-    void rewind();
+	void rewind();
 
-    boolean isPlaying();
+	boolean isPlaying();
 
-    float getPlayingDuration();
+	float getPlayingDuration();
+
+	void setup(URL url) throws IOException;
+
+	void setup(URL url, String type) throws IOException;
 }
