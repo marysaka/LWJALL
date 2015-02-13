@@ -6,6 +6,7 @@ import java.nio.IntBuffer;
 
 import javax.sound.sampled.AudioFormat;
 
+import org.lwjgl.BufferUtils;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.openal.AL10;
 import org.lwjgl.openal.AL11;
@@ -235,4 +236,51 @@ public class NormalChannel implements IChannel
 	{
 		return format;
 	}
-}
+
+    private String checkALError()
+    {
+        switch(AL10.alGetError())
+        {
+            case AL10.AL_NO_ERROR:
+                return null;
+            case AL10.AL_INVALID_NAME:
+                return "Invalid name parameter.";
+            case AL10.AL_INVALID_ENUM:
+                return "Invalid parameter.";
+            case AL10.AL_INVALID_VALUE:
+                return "Invalid enumerated parameter value.";
+            case AL10.AL_INVALID_OPERATION:
+                return "Illegal call.";
+            case AL10.AL_OUT_OF_MEMORY:
+                return "Unable to allocate memory.";
+            default:
+                return "An unknow error occurred.";
+        }
+    }
+
+    public boolean addToBufferQueue(byte[] buffer)
+    {
+
+        ByteBuffer byteBuffer = (ByteBuffer) BufferUtils.createByteBuffer(
+                buffer.length).put(buffer).flip();
+
+        IntBuffer intBuffer = BufferUtils.createIntBuffer(1);
+
+        AL10.alSourceUnqueueBuffers(source.get(0), intBuffer);
+        if(checkALError() != null)
+            return false;
+
+        checkALError();
+
+        AL10.alBufferData(intBuffer.get(0), format, byteBuffer, sampleRate);
+        if(checkALError() != null)
+            return false;
+
+        AL10.alSourceQueueBuffers(source.get(0), intBuffer);
+        if(checkALError() != null)
+            return false;
+
+        return true;
+    }
+
+    }

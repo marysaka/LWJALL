@@ -10,6 +10,7 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
+import eu.thog92.lwjall.ICodecManager;
 import eu.thog92.lwjall.Source;
 import eu.thog92.lwjall.util.Buffers;
 
@@ -19,7 +20,12 @@ import org.lwjgl.openal.AL10;
 public class DirectSource extends Source
 {
 
-	@Override
+    public DirectSource(ICodecManager codecManager)
+    {
+        super(codecManager);
+    }
+
+    @Override
 	public void setup(URL url, String type) throws IOException, LWJGLException
 	{
         System.out.println(url);

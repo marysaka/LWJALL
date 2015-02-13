@@ -6,14 +6,17 @@ import java.net.URL;
 
 import eu.thog92.lwjall.ALSoundProvider;
 
+import eu.thog92.lwjall.ICodecManager;
+import eu.thog92.lwjall.ISoundProvider;
 import eu.thog92.lwjall.Source;
+import eu.thog92.lwjall.codecs.WavCodec;
 import org.lwjgl.LWJGLException;
 
 public class Main
 {
 	public static void main(String[] args) throws LWJGLException, MalformedURLException, InterruptedException
     {
-		ALSoundProvider soundProvider = new ALSoundProvider();
+		ISoundProvider soundProvider = new ALSoundProvider();
 
 		URL url = new File("resources/test_mono_8000Hz_8bit_PCM.wav").toURI().toURL(); // file from http://download.wavetlan.com/SVV/Media/HTTP/test_mono_8000Hz_8bit_PCM.wav
 		System.out.println("Preparing source");

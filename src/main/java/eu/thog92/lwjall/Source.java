@@ -9,47 +9,50 @@ import org.lwjgl.LWJGLException;
 
 public abstract class Source
 {
-	String				name;
+    protected final ICodecManager codecManager;
+    String name;
 
-	private float		 pitch;
+    private float pitch;
 
-	private float		 distanceFromListener;
+    private float distanceFromListener;
 
-	private float		 gain	= 1.0F;
+    private float gain = 1.0F;
 
-	private float		 volume  = 1.0F;
+    private float volume = 1.0F;
 
-	protected IChannel	channel;
+    protected IChannel channel;
 
-	protected AudioBuffer audioBuffer;
+    protected AudioBuffer audioBuffer;
 
-	/**
-	 * False when this source gets culled.
-	 */
-	private boolean	   active  = true;
+    /**
+     * False when this source gets culled.
+     */
+    private boolean active = true;
 
-	/**
-	 * Whether or not this source has been stopped.
-	 */
-	private boolean	   stopped = true;
+    /**
+     * Whether or not this source has been stopped.
+     */
+    private boolean stopped = true;
 
-	/**
-	 * Whether or not this source has been paused.
-	 */
-	private boolean	   paused  = false;
+    /**
+     * Whether or not this source has been paused.
+     */
+    private boolean paused = false;
 
-	// TODO: Vector?
-	protected FloatBuffer position;
+    // TODO: Vector?
+    protected FloatBuffer position;
 
-	protected FloatBuffer velocity;
+    protected FloatBuffer velocity;
+    public    ICodec      codec;
 
-	public Source()
-	{
-		position = BufferUtils.createFloatBuffer(3);
-		velocity = BufferUtils.createFloatBuffer(3);
-	}
+    public Source(ICodecManager codecManager)
+    {
+        this.codecManager = codecManager;
+        position = BufferUtils.createFloatBuffer(3);
+        velocity = BufferUtils.createFloatBuffer(3);
+    }
 
-	public float getPitch()
+    public float getPitch()
 	{
 		return pitch;
 	}

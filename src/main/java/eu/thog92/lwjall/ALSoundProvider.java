@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import eu.thog92.lwjall.codecs.WavCodec;
 import eu.thog92.lwjall.sources.DirectSource;
 import eu.thog92.lwjall.sources.StreamingSource;
 
@@ -42,8 +43,14 @@ public class ALSoundProvider implements ISoundProvider, Runnable
 
 	private boolean			 running;
 
+    private ALCodecManager codecManager;
+
 	public ALSoundProvider() throws LWJGLException
 	{
+        codecManager = new ALCodecManager();
+        codecManager.registerCodec("wav", WavCodec.class);
+
+
 		System.out.println("Initializing LWJALL...");
 		AL.create();
 		String errorMessage = checkALError();
@@ -214,11 +221,11 @@ public class ALSoundProvider implements ISoundProvider, Runnable
 		Source source = null;
 		if(streaming)
 		{
-			source = new StreamingSource();
+			source = new StreamingSource(codecManager);
 		}
 		else
 		{
-			source = new DirectSource();
+			source = new DirectSource(codecManager);
 		}
 		source.name = sourceName;
 		source.channel = freeChannel();
@@ -238,7 +245,13 @@ public class ALSoundProvider implements ISoundProvider, Runnable
 		return source;
 	}
 
-	private IChannel freeChannel()
+    @Override
+    public ICodecManager getCodecManager()
+    {
+        return codecManager;
+    }
+
+    private IChannel freeChannel()
 	{
 		for(IChannel channel : channels)
 		{

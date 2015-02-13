@@ -28,7 +28,11 @@ public interface ISoundProvider
 
 	void play(String sourceName);
 
+    boolean isPlaying(String test);
+
 	Source newSource(String sourceName, URL url, boolean streaming);
 
 	Source newSource(String sourceName, URL url, String type, boolean streaming);
+
+    ICodecManager getCodecManager();
 }
