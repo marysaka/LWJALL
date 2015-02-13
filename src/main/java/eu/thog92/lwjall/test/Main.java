@@ -19,6 +19,8 @@ public class Main
 		System.out.println("Starting to play");
 		soundProvider.play("test");
 
+		while(soundProvider.isPlaying("test"))
+			;
 		System.out.println("End of playing");
 		soundProvider.cleanUp();
 	}
