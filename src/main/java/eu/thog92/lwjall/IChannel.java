@@ -1,48 +1,47 @@
 package eu.thog92.lwjall;
 
-import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
+import org.lwjgl.LWJGLException;
 
 import javax.sound.sampled.AudioFormat;
-
-import org.lwjgl.LWJGLException;
+import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
 
 public interface IChannel
 {
 
-	int getSampleRate();
+    int getSampleRate();
 
-	void setSampleRate(int sampleRate);
+    void setSampleRate(int sampleRate);
 
-	int getSource(int index);
+    int getSource(int index);
 
-	void cleanup();
+    void cleanup();
 
-	void setAudioFormat(AudioFormat audioFormat);
+    void setAudioFormat(AudioFormat audioFormat);
 
-	void play();
+    void play();
 
-	void pause();
+    void pause();
 
-	void stop();
+    void stop();
 
-	void rewind();
+    void rewind();
 
-	boolean isPlaying();
+    boolean isPlaying();
 
-	float getPlayingDuration();
+    float getPlayingDuration();
 
-	void setup(AudioFormat audioFormat, ByteBuffer buffer) throws LWJGLException;
+    void setup(AudioFormat audioFormat, ByteBuffer buffer) throws LWJGLException;
 
-	boolean hasStopped();
+    boolean hasStopped();
 
-	void setGain(float gain);
+    float getGain();
 
-	float getGain();
+    void setGain(float gain);
 
-	void setVelocity(FloatBuffer velocity);
+    void setVelocity(FloatBuffer velocity);
 
-	void setPosition(FloatBuffer pos);
+    void setPosition(FloatBuffer pos);
 
-	int getFormat();
+    int getFormat();
 }

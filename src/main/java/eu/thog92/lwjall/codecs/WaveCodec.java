@@ -12,7 +12,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.nio.ByteBuffer;
 
-public class WavCodec implements ICodec
+public class WaveCodec implements ICodec
 {
     private AudioFormat format;
     private boolean     isInitialized;
@@ -21,7 +21,8 @@ public class WavCodec implements ICodec
     private int         buffers;
     private boolean     eof;
 
-    @Override public boolean initialize(URL url, IChannel channel) throws IOException
+    @Override
+    public boolean initialize(URL url, IChannel channel) throws IOException
     {
         this.isInitialized = true;
         this.input = url.openStream();
@@ -33,10 +34,12 @@ public class WavCodec implements ICodec
     private boolean prepareBuffers(int n) throws IOException
     {
         if(input.available() <= 0)
-            return true;
-        for(int i = 0; i < n; i++ )
         {
-            buffers++ ;
+            return true;
+        }
+        for(int i = 0; i < n; i++)
+        {
+            buffers++;
             byte[] buffer = new byte[48000];
             int length = input.read(buffer);
             if(length == -1)
@@ -56,7 +59,8 @@ public class WavCodec implements ICodec
         return false;
     }
 
-    @Override public boolean initialized()
+    @Override
+    public boolean initialized()
     {
         return false;
     }
@@ -67,22 +71,26 @@ public class WavCodec implements ICodec
         this.format = null;
     }
 
-    @Override public AudioBuffer read()
+    @Override
+    public AudioBuffer read()
     {
         return null;
     }
 
-    @Override public AudioFormat getAudioFormat()
+    @Override
+    public AudioFormat getAudioFormat()
     {
         return format;
     }
 
-    @Override public void setAudioFormat(AudioFormat format)
+    @Override
+    public void setAudioFormat(AudioFormat format)
     {
         this.format = format;
     }
 
-    @Override public void update(int buffersProcessed)
+    @Override
+    public void update(int buffersProcessed)
     {
 
         buffers -= buffersProcessed;
