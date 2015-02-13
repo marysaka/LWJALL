@@ -117,4 +117,9 @@ public abstract class Source
 	}
 
 	public abstract void setup(URL url, String type) throws IOException, LWJGLException;
+
+	public void update()
+	{
+		;
+	}
 }

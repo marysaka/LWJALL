@@ -17,7 +17,7 @@ import org.lwjgl.LWJGLException;
 import org.lwjgl.openal.AL;
 import org.lwjgl.openal.AL10;
 
-public class ALSoundProvider implements ISoundProvider
+public class ALSoundProvider implements ISoundProvider, Runnable
 {
 	/**
 	 * Position of the listener in 3D space.
@@ -39,6 +39,8 @@ public class ALSoundProvider implements ISoundProvider
 	private boolean			 supportPitch;
 
 	private Map<String, Source> sources;
+
+	private boolean			 running;
 
 	public ALSoundProvider() throws LWJGLException
 	{
@@ -119,6 +121,7 @@ public class ALSoundProvider implements ISoundProvider
 		}
 		sources = new HashMap<String, Source>();
 
+		new Thread(this).start();
 		System.out.println("LWJALL is ready!");
 	}
 
@@ -184,6 +187,7 @@ public class ALSoundProvider implements ISoundProvider
 	@Override
 	public void cleanUp()
 	{
+		running = false;
 		System.out.println("LWJALL shutting down...");
 		AL.destroy();
 		System.out.println("OpenAL destroyed");
@@ -252,6 +256,38 @@ public class ALSoundProvider implements ISoundProvider
 		Source source = sources.get(sourceName);
 		if(source != null) return source.channel.isPlaying();
 		return false;
+	}
+
+	@Override
+	public void run()
+	{
+		float frequency = 20.f;
+		float period = 1.f / frequency;
+		long periodInMilli = (long)(period * 1000);
+		long totalTime = 0L;
+		long startTime = System.currentTimeMillis();
+		running = true;
+		while(running)
+		{
+			long elapsed = System.currentTimeMillis() - startTime;
+			if(elapsed >= periodInMilli)
+			{
+				for(int i = 0; i < elapsed / periodInMilli; i++ ) // If we skip a frame, run it
+				{
+					update(); // TODO run frame
+				}
+				startTime = System.currentTimeMillis();
+			}
+			totalTime += elapsed;
+		}
+	}
+
+	private void update()
+	{
+		for(Source s : sources.values())
+		{
+			s.update();
+		}
 	}
 
 }

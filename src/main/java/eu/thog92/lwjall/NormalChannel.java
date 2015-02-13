@@ -229,4 +229,10 @@ public class NormalChannel implements IChannel
 	{
 		AL10.alSource(source.get(0), AL10.AL_POSITION, pos);
 	}
+
+	@Override
+	public int getFormat()
+	{
+		return format;
+	}
 }

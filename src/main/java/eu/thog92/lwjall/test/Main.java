@@ -13,9 +13,9 @@ public class Main
 	{
 		ALSoundProvider soundProvider = new ALSoundProvider();
 
-		URL url = new URL("http://download.wavetlan.com/SVV/Media/HTTP/test_mono_8000Hz_8bit_PCM.wav");
-		System.out.println("Downloading sample");
-		soundProvider.newSource("test", url, "wav", false);
+		URL url = Main.class.getResource("/test_mono_8000Hz_8bit_PCM.wav"); // file from http://download.wavetlan.com/SVV/Media/HTTP/test_mono_8000Hz_8bit_PCM.wav
+		System.out.println("Preparing source");
+		soundProvider.newSource("test", url, "wav", true);
 		System.out.println("Starting to play");
 		soundProvider.play("test");
 

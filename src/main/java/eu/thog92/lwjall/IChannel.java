@@ -43,4 +43,6 @@ public interface IChannel
 	void setVelocity(FloatBuffer velocity);
 
 	void setPosition(FloatBuffer pos);
+
+	int getFormat();
 }
