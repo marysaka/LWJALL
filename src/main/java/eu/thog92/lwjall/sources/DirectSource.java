@@ -14,6 +14,7 @@ import eu.thog92.lwjall.Source;
 import eu.thog92.lwjall.util.Buffers;
 
 import org.lwjgl.LWJGLException;
+import org.lwjgl.openal.AL10;
 
 public class DirectSource extends Source
 {
@@ -21,6 +22,7 @@ public class DirectSource extends Source
 	@Override
 	public void setup(URL url, String type) throws IOException, LWJGLException
 	{
+        System.out.println(url);
 		InputStream stream = url.openStream();
 		AudioFormat audioFormat = null;
 		try
@@ -36,5 +38,13 @@ public class DirectSource extends Source
 		stream.close();
 		channel.setup(audioFormat, buffer);
 	}
+
+    @Override
+    public void setVolume(float volume)
+    {
+        super.setVolume(volume);
+        if(channel != null)
+            AL10.alSourcef(channel.getSource(0), AL10.AL_GAIN, (getGain() * getVolume()));
+    }
 
 }

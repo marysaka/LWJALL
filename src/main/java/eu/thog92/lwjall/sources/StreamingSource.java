@@ -16,28 +16,29 @@ import org.lwjgl.openal.AL10;
 public class StreamingSource extends Source
 {
 
-	private InputStream input;
-	private String	  type;
-	private int		 buffers;
-	private boolean	 eof;
+    private InputStream input;
+    private String      type;
+    private int         buffers;
+    private boolean     eof;
+    private boolean gainChange;
 
-	@Override
-	public void setup(URL url, String type) throws IOException
-	{
-		this.type = type;
-		try
-		{
-			channel.setAudioFormat(AudioSystem.getAudioFileFormat(url).getFormat());
-		}
-		catch(UnsupportedAudioFileException e)
-		{
-			throw new IOException("Could not read sound file.", e);
-		}
-		this.input = url.openStream();
-		prepareBuffers(type, 2);
-	}
+    @Override
+    public void setup(URL url, String type) throws IOException
+    {
+        this.type = type;
+        try
+        {
+            channel.setAudioFormat(AudioSystem.getAudioFileFormat(url).getFormat());
+        }
+        catch(UnsupportedAudioFileException e)
+        {
+            throw new IOException("Could not read sound file.", e);
+        }
+        this.input = url.openStream();
+        prepareBuffers(type, 2);
+    }
 
-	private boolean prepareBuffers(String type, int n) throws IOException
+    private boolean prepareBuffers(String type, int n) throws IOException
 	{
 		if(input.available() <= 0) return true;
 		for(int i = 0; i < n; i++ )
@@ -65,6 +66,11 @@ public class StreamingSource extends Source
 	@Override
 	public void update()
 	{
+        if(gainChange)
+        {
+            AL10.alSourcef( channel.getSource(0), AL10.AL_GAIN, (getGain() * getVolume()));
+            this.gainChange = false;
+        }
 		int buffersProcessed = AL10.alGetSourcei(channel.getSource(0), AL10.AL_BUFFERS_PROCESSED);
 		for(int i = 0; i < buffersProcessed; i++ )
 		{
@@ -88,5 +94,12 @@ public class StreamingSource extends Source
 			}
 		}
 	}
+
+    @Override
+    public void setVolume(float volume)
+    {
+        super.setVolume(volume);
+        this.gainChange = true;
+    }
 
 }
