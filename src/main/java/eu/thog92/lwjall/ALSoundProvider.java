@@ -46,11 +46,11 @@ public class ALSoundProvider implements ISoundProvider, Runnable
 
     public ALSoundProvider() throws LWJGLException
     {
+        AL.create();
         codecManager = new ALCodecManager();
         codecManager.registerCodec("wav", WaveCodec.class);
 
         System.out.println("Initializing LWJALL...");
-        AL.create();
         String errorMessage = checkALError();
         if(errorMessage != null)
         {

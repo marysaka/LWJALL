@@ -3,10 +3,15 @@ package eu.thog92.lwjall.codecs;
 import eu.thog92.lwjall.AudioBuffer;
 import eu.thog92.lwjall.IChannel;
 import eu.thog92.lwjall.ICodec;
+
 import org.lwjgl.BufferUtils;
 import org.lwjgl.openal.AL10;
 
 import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.UnsupportedAudioFileException;
+
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -22,16 +27,16 @@ public class WaveCodec implements ICodec
     private boolean     eof;
 
     @Override
-    public boolean initialize(URL url, IChannel channel) throws IOException
+    public boolean initialize(URL url, IChannel channel) throws IOException, UnsupportedAudioFileException
     {
         this.isInitialized = true;
         this.input = url.openStream();
         this.channel = channel;
-        prepareBuffers(2);
+        format = AudioSystem.getAudioFileFormat(url).getFormat();
         return false;
     }
 
-    private boolean prepareBuffers(int n) throws IOException
+    public boolean prepareBuffers(int n) throws IOException
     {
         if(input.available() <= 0)
         {
@@ -40,16 +45,9 @@ public class WaveCodec implements ICodec
         for(int i = 0; i < n; i++)
         {
             buffers++;
-            byte[] buffer = new byte[48000];
-            int length = input.read(buffer);
-            if(length == -1)
-            {
-                input.close();
-                return true;
-            }
-            ByteBuffer audioBuffer = BufferUtils.createByteBuffer(length);
-            audioBuffer.put(buffer, 0, length);
-            audioBuffer.flip();
+            AudioBuffer buffer = read(48000);
+            if(buffer == null) return true;
+            ByteBuffer audioBuffer = buffer.toByteBuffer();
 
             int bufferPointer = AL10.alGenBuffers();
             AL10.alBufferData(bufferPointer, channel.getFormat(), audioBuffer, channel.getSampleRate());
@@ -72,9 +70,18 @@ public class WaveCodec implements ICodec
     }
 
     @Override
-    public AudioBuffer read()
+    public AudioBuffer read(int n) throws IOException
     {
-        return null;
+        if(n < 0) throw new NegativeArraySizeException("Negative reading size asked: " + n);
+        byte[] data = new byte[n];
+        int length = input.read(data);
+        if(length == -1)
+        {
+            return null;
+        }
+        AudioBuffer buffer = new AudioBuffer(data, getAudioFormat());
+        buffer.trimData(length);
+        return buffer;
     }
 
     @Override
@@ -92,7 +99,6 @@ public class WaveCodec implements ICodec
     @Override
     public void update(int buffersProcessed)
     {
-
         buffers -= buffersProcessed;
         if(buffers == 0 && eof)
         {
@@ -109,5 +115,26 @@ public class WaveCodec implements ICodec
                 e.printStackTrace();
             }
         }
+    }
+
+    @Override
+    public InputStream getInputStream()
+    {
+        return input;
+    }
+
+    @Override
+    public AudioBuffer readAll() throws IOException
+    {
+        byte[] data = new byte[4096];
+        int length;
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        while((length = input.read(data)) != -1)
+        {
+            out.write(data, 0, length);
+        }
+        out.flush();
+        out.close();
+        return new AudioBuffer(out.toByteArray(), getAudioFormat());
     }
 }

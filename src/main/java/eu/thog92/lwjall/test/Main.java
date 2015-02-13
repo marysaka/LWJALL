@@ -18,12 +18,12 @@ public class Main
         URL url = new File("resources/test_mono_8000Hz_8bit_PCM.wav").toURI().toURL(); // file from http://download.wavetlan.com/SVV/Media/HTTP/test_mono_8000Hz_8bit_PCM.wav
         System.out.println("Preparing source");
         Source source = soundProvider.newSource("test", url, "wav", true);
-        source.setVolume(0.10F);
+        source.setVolume(0.90F);
         System.out.println("Starting to play");
         soundProvider.play("test");
 
         while(soundProvider.isPlaying("test"))
-            Thread.sleep(10000);
+            ;
         System.out.println("End of playing");
         soundProvider.cleanUp();
     }

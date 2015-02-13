@@ -36,15 +36,13 @@ public class StreamingSource extends Source
         }
         try
         {
-            AudioFormat format = AudioSystem.getAudioFileFormat(url).getFormat();
-            channel.setAudioFormat(format);
-            codec.setAudioFormat(format);
+            codec.initialize(url, channel);
+            codec.prepareBuffers(2);
         }
         catch(UnsupportedAudioFileException e)
         {
             throw new IOException("Could not read sound file.", e);
         }
-        codec.initialize(url, channel);
     }
 
     @Override

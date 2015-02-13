@@ -1,19 +1,22 @@
 package eu.thog92.lwjall.sources;
 
-import eu.thog92.lwjall.ICodecManager;
-import eu.thog92.lwjall.Source;
-import eu.thog92.lwjall.util.Buffers;
-import org.lwjgl.LWJGLException;
-import org.lwjgl.openal.AL10;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.nio.ByteBuffer;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.nio.ByteBuffer;
+
+import eu.thog92.lwjall.ICodec;
+import eu.thog92.lwjall.ICodecManager;
+import eu.thog92.lwjall.Source;
+import eu.thog92.lwjall.util.Buffers;
+
+import org.lwjgl.LWJGLException;
+import org.lwjgl.openal.AL10;
 
 public class DirectSource extends Source
 {
@@ -27,20 +30,17 @@ public class DirectSource extends Source
     public void setup(URL url, String type) throws IOException, LWJGLException
     {
         System.out.println(url);
-        InputStream stream = url.openStream();
-        AudioFormat audioFormat = null;
+        ICodec codec = codecManager.getCodec(type);
         try
         {
-            AudioInputStream ain = AudioSystem.getAudioInputStream(url);
-            audioFormat = ain.getFormat();
+            codec.initialize(url, channel);
         }
         catch(UnsupportedAudioFileException e)
         {
-            e.printStackTrace();
+            throw new IOException("Invalid file", e);
         }
-        ByteBuffer buffer = Buffers.consumeStream(stream);
-        stream.close();
-        channel.setup(audioFormat, buffer);
+        AudioFormat audioFormat = codec.getAudioFormat();
+        channel.setup(audioFormat, codec.readAll().toByteBuffer());
     }
 
     @Override

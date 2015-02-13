@@ -1,6 +1,10 @@
 package eu.thog92.lwjall;
 
+import java.nio.ByteBuffer;
+
 import javax.sound.sampled.AudioFormat;
+
+import eu.thog92.lwjall.util.Buffers;
 
 public class AudioBuffer
 {
@@ -38,5 +42,10 @@ public class AudioBuffer
             System.arraycopy(data, 0, trimmedArray, 0, maxLength);
             data = trimmedArray;
         }
+    }
+
+    public ByteBuffer toByteBuffer()
+    {
+        return Buffers.flippedByteBuffer(data);
     }
 }
