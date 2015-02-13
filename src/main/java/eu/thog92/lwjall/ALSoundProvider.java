@@ -1,10 +1,16 @@
 package eu.thog92.lwjall;
 
+import java.io.IOException;
 import java.net.URL;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import eu.thog92.lwjall.sources.DirectSource;
+import eu.thog92.lwjall.sources.StreamingSource;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.LWJGLException;
@@ -16,21 +22,23 @@ public class ALSoundProvider implements ISoundProvider
 	/**
 	 * Position of the listener in 3D space.
 	 */
-	private FloatBuffer	listenerPosition	= null;
+	private FloatBuffer		 listenerPosition	= null;
 
 	/**
 	 * Information about the listener's orientation.
 	 */
-	private FloatBuffer	listenerOrientation = null;
+	private FloatBuffer		 listenerOrientation = null;
 
 	/**
 	 * Velocity of the listener.
 	 */
-	private FloatBuffer	listenerVelocity	= null;
+	private FloatBuffer		 listenerVelocity	= null;
 
-	private List<IChannel> channels;
+	private List<IChannel>	  channels;
 
-	private boolean		supportPitch;
+	private boolean			 supportPitch;
+
+	private Map<String, Source> sources;
 
 	public ALSoundProvider() throws LWJGLException
 	{
@@ -109,6 +117,8 @@ public class ALSoundProvider implements ISoundProvider
 		{
 			this.supportPitch = true;
 		}
+		sources = new HashMap<String, Source>();
+
 		System.out.println("LWJALL is ready!");
 	}
 
@@ -180,16 +190,68 @@ public class ALSoundProvider implements ISoundProvider
 	}
 
 	@Override
-	public void play(String sourceName, URL url, boolean streaming)
+	public void play(String sourceName)
 	{
-		String type = url.getFile().substring(url.getFile().lastIndexOf("."));
-		play(sourceName, url, type, streaming);
+		Source source = sources.get(sourceName);
+		if(source == null) throw new NullPointerException("The source " + sourceName + " does not exist");
+		source.channel.play();
 	}
 
 	@Override
-	public void play(String sourceName, URL url, String type, boolean streaming)
+	public Source newSource(String sourceName, URL url, boolean streaming)
 	{
-		// TODO Find unused channel (or override) and set it up in order to play
-		// the sound/music after it
+		String type = url.getFile().substring(url.getFile().lastIndexOf("."));
+		return newSource(sourceName, url, type, streaming);
 	}
+
+	@Override
+	public Source newSource(String sourceName, URL url, String type, boolean streaming)
+	{
+		Source source = null;
+		if(streaming)
+		{
+			source = new StreamingSource();
+		}
+		else
+		{
+			source = new DirectSource();
+		}
+		source.name = sourceName;
+		source.channel = freeChannel();
+		try
+		{
+			source.setup(url, type);
+		}
+		catch(IOException e)
+		{
+			e.printStackTrace();
+		}
+		catch(LWJGLException e)
+		{
+			e.printStackTrace();
+		}
+		sources.put(sourceName, source);
+		return source;
+	}
+
+	private IChannel freeChannel()
+	{
+		for(IChannel channel : channels)
+		{
+			if(channel.hasStopped())
+			{
+				return channel;
+			}
+		}
+		// TODO: Find a channel to use
+		return null;
+	}
+
+	public boolean isPlaying(String sourceName)
+	{
+		Source source = sources.get(sourceName);
+		if(source != null) return source.channel.isPlaying();
+		return false;
+	}
+
 }

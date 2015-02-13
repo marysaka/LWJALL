@@ -1,9 +1,11 @@
 package eu.thog92.lwjall;
 
-import java.io.IOException;
-import java.net.URL;
+import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
 
 import javax.sound.sampled.AudioFormat;
+
+import org.lwjgl.LWJGLException;
 
 public interface IChannel
 {
@@ -30,7 +32,15 @@ public interface IChannel
 
 	float getPlayingDuration();
 
-	void setup(URL url) throws IOException;
+	void setup(AudioFormat audioFormat, ByteBuffer buffer) throws LWJGLException;
 
-	void setup(URL url, String type) throws IOException;
+	boolean hasStopped();
+
+	void setGain(float gain);
+
+	float getGain();
+
+	void setVelocity(FloatBuffer velocity);
+
+	void setPosition(FloatBuffer pos);
 }

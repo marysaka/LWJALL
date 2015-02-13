@@ -26,7 +26,9 @@ public interface ISoundProvider
 
 	void cleanUp();
 
-	void play(String sourceName, URL url, boolean streaming);
+	void play(String sourceName);
 
-	void play(String sourceName, URL url, String type, boolean streaming);
+	Source newSource(String sourceName, URL url, boolean streaming);
+
+	Source newSource(String sourceName, URL url, String type, boolean streaming);
 }

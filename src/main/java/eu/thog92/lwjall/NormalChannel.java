@@ -1,15 +1,12 @@
 package eu.thog92.lwjall;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
 import javax.sound.sampled.AudioFormat;
 
-import eu.thog92.lwjall.util.Buffers;
-
+import org.lwjgl.LWJGLException;
 import org.lwjgl.openal.AL10;
 import org.lwjgl.openal.AL11;
 
@@ -37,9 +34,15 @@ public class NormalChannel implements IChannel
 
 	private int	   bufferPointer;
 
+	private boolean   stopped;
+
+	private float	 gain;
+
 	public NormalChannel(IntBuffer source)
 	{
 		this.source = source;
+		stopped = true;
+		gain = 1.f;
 	}
 
 	@Override
@@ -127,6 +130,8 @@ public class NormalChannel implements IChannel
 	@Override
 	public void play()
 	{
+		stopped = false;
+		AL10.alSourcef(source.get(0), AL10.AL_GAIN, 1);
 		AL10.alSourcePlay(source.get(0));
 	}
 
@@ -139,6 +144,7 @@ public class NormalChannel implements IChannel
 	@Override
 	public void stop()
 	{
+		stopped = true;
 		AL10.alSourceStop(source.get(0));
 	}
 
@@ -173,27 +179,54 @@ public class NormalChannel implements IChannel
 				bytesPerFrame = 4f;
 				break;
 			default:
+				System.out.println("Unknown format: " + format);
 				break;
 		}
 		return (((float)AL10.alGetSourcei(source.get(0), AL11.AL_BYTE_OFFSET) / bytesPerFrame) / (float)sampleRate) * 1000;
 	}
 
 	@Override
-	public void setup(URL url) throws IOException
+	public void setup(AudioFormat audioFormat, ByteBuffer buffer) throws LWJGLException
 	{
-		String type = url.getFile().substring(url.getFile().lastIndexOf("."));
-		setup(url, type);
+		setAudioFormat(audioFormat);
+		bufferPointer = AL10.alGenBuffers();
+		int error = AL10.alGetError();
+		if(error != AL10.AL_NO_ERROR) throw new LWJGLException("Error while creating sound buffer: " + error);
+		AL10.alBufferData(bufferPointer, format, buffer, sampleRate);
+
+		AL10.alSourcei(source.get(0), AL10.AL_BUFFER, bufferPointer);
+
+		error = AL10.alGetError();
+		if(error != AL10.AL_NO_ERROR) throw new LWJGLException("Error while uploading sound buffer: " + error);
 	}
 
 	@Override
-	public void setup(URL url, String type) throws IOException
+	public boolean hasStopped()
 	{
-		InputStream stream = url.openStream();
-		ByteBuffer buffer = Buffers.consumeStream(stream);
-		stream.close();
-		bufferPointer = AL10.alGenBuffers();
-		int error = AL10.alGetError();
-		if(error != AL10.AL_NO_ERROR) throw new IOException("Error while creating sound buffer: " + error);
-		AL10.alBufferData(bufferPointer, format, buffer, sampleRate);
+		return stopped;
+	}
+
+	@Override
+	public void setGain(float gain)
+	{
+		this.gain = gain;
+	}
+
+	@Override
+	public float getGain()
+	{
+		return gain;
+	}
+
+	@Override
+	public void setVelocity(FloatBuffer velocity)
+	{
+		AL10.alSource(source.get(0), AL10.AL_VELOCITY, velocity);
+	}
+
+	@Override
+	public void setPosition(FloatBuffer pos)
+	{
+		AL10.alSource(source.get(0), AL10.AL_POSITION, pos);
 	}
 }

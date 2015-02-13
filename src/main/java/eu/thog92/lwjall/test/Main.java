@@ -1,14 +1,25 @@
 package eu.thog92.lwjall.test;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
 import eu.thog92.lwjall.ALSoundProvider;
+
 import org.lwjgl.LWJGLException;
 
 public class Main
 {
-    public static void main(String[] args) throws LWJGLException
-    {
-        ALSoundProvider soundProvider = new ALSoundProvider();
+	public static void main(String[] args) throws LWJGLException, MalformedURLException
+	{
+		ALSoundProvider soundProvider = new ALSoundProvider();
 
-        soundProvider.cleanUp();
-    }
+		URL url = new URL("http://download.wavetlan.com/SVV/Media/HTTP/test_mono_8000Hz_8bit_PCM.wav");
+		System.out.println("Downloading sample");
+		soundProvider.newSource("test", url, "wav", false);
+		System.out.println("Starting to play");
+		soundProvider.play("test");
+
+		System.out.println("End of playing");
+		soundProvider.cleanUp();
+	}
 }
