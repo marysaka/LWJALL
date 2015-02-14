@@ -1,21 +1,20 @@
 package eu.thog92.lwjall.codecs;
 
-import eu.thog92.lwjall.AudioBuffer;
-import eu.thog92.lwjall.IChannel;
-import eu.thog92.lwjall.ICodec;
-
-import org.lwjgl.BufferUtils;
-import org.lwjgl.openal.AL10;
-
-import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.UnsupportedAudioFileException;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.ByteBuffer;
+
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.UnsupportedAudioFileException;
+
+import eu.thog92.lwjall.AudioBuffer;
+import eu.thog92.lwjall.IChannel;
+import eu.thog92.lwjall.ICodec;
+
+import org.lwjgl.openal.AL10;
 
 public class WaveCodec implements ICodec
 {
@@ -33,7 +32,7 @@ public class WaveCodec implements ICodec
         this.input = url.openStream();
         this.channel = channel;
         format = AudioSystem.getAudioFileFormat(url).getFormat();
-        return false;
+        return true;
     }
 
     public boolean prepareBuffers(int n) throws IOException
@@ -60,13 +59,15 @@ public class WaveCodec implements ICodec
     @Override
     public boolean initialized()
     {
-        return false;
+        return isInitialized;
     }
 
     @Override
-    public void cleanup()
+    public void cleanup() throws IOException
     {
         this.format = null;
+        buffers = 0;
+        input.close();
     }
 
     @Override
@@ -115,12 +116,6 @@ public class WaveCodec implements ICodec
                 e.printStackTrace();
             }
         }
-    }
-
-    @Override
-    public InputStream getInputStream()
-    {
-        return input;
     }
 
     @Override

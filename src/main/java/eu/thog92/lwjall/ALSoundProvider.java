@@ -1,8 +1,10 @@
 package eu.thog92.lwjall;
 
+import eu.thog92.lwjall.codecs.VorbisCodec;
 import eu.thog92.lwjall.codecs.WaveCodec;
 import eu.thog92.lwjall.sources.DirectSource;
 import eu.thog92.lwjall.sources.StreamingSource;
+
 import org.lwjgl.BufferUtils;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.openal.AL;
@@ -49,6 +51,7 @@ public class ALSoundProvider implements ISoundProvider, Runnable
         AL.create();
         codecManager = new ALCodecManager();
         codecManager.registerCodec("wav", WaveCodec.class);
+        codecManager.registerCodec("ogg", VorbisCodec.class);
 
         System.out.println("Initializing LWJALL...");
         String errorMessage = checkALError();

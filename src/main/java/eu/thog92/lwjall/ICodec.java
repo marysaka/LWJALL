@@ -30,10 +30,26 @@ public interface ICodec
      */
     boolean initialized();
 
-    void cleanup();
+    void cleanup() throws IOException;
 
+    /**
+     * Reads in the stream
+     * 
+     * @param n
+     *            The meaning of n is implementation-dependent. For instance, for wave files it is a number of bytes whereas for Vorbis files it represents a number of buffers
+     * @return
+     *         An AudioBuffer with the requested data
+     * @throws IOException
+     */
     AudioBuffer read(int n) throws IOException;
 
+    /**
+     * Reads all data from the stream
+     * 
+     * @return
+     *         An AudioBuffer containing all the sound data
+     * @throws IOException
+     */
     AudioBuffer readAll() throws IOException;
 
     /**
@@ -46,8 +62,6 @@ public interface ICodec
     void setAudioFormat(AudioFormat format);
 
     void update(int buffersProcessed);
-
-    InputStream getInputStream();
 
     boolean prepareBuffers(int n) throws IOException;
 

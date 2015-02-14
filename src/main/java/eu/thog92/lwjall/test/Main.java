@@ -15,9 +15,10 @@ public class Main
     {
         ISoundProvider soundProvider = new ALSoundProvider();
 
-        URL url = new File("resources/test_mono_8000Hz_8bit_PCM.wav").toURI().toURL(); // file from http://download.wavetlan.com/SVV/Media/HTTP/test_mono_8000Hz_8bit_PCM.wav
+        //URL url = new File("resources/test_mono_8000Hz_8bit_PCM.wav").toURI().toURL(); // file from http://download.wavetlan.com/SVV/Media/HTTP/test_mono_8000Hz_8bit_PCM.wav
+        URL url = new File("resources/test.ogg").toURI().toURL();
         System.out.println("Preparing source");
-        Source source = soundProvider.newSource("test", url, "wav", true);
+        Source source = soundProvider.newSource("test", url, "ogg", false);
         source.setVolume(0.90F);
         System.out.println("Starting to play");
         soundProvider.play("test");

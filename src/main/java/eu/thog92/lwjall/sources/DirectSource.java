@@ -37,7 +37,7 @@ public class DirectSource extends Source
         }
         catch(UnsupportedAudioFileException e)
         {
-            throw new IOException("Invalid file", e);
+            throw new IOException("Invalid file: " + url.toExternalForm(), e);
         }
         AudioFormat audioFormat = codec.getAudioFormat();
         channel.setup(audioFormat, codec.readAll().toByteBuffer());
