@@ -1,4 +1,4 @@
-package eu.thog92.lwjall;
+package eu.thog92.lwjall.api;
 
 import java.net.URL;
 

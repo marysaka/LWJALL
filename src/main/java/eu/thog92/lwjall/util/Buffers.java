@@ -6,6 +6,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
 
 public final class Buffers
 {
@@ -79,5 +81,9 @@ public final class Buffers
             System.arraycopy(arrayTwo, 0, result, arrayOne.length, bytes);
             return result;
         }
+    }
+
+    public static FloatBuffer createFloatBuffer(int size) {
+        return ByteBuffer.allocateDirect(size << 2).order(ByteOrder.nativeOrder()).asFloatBuffer();
     }
 }

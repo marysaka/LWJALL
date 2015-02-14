@@ -1,30 +1,29 @@
-package eu.thog92.lwjall;
+package eu.thog92.lwjall.api;
 
-import org.lwjgl.BufferUtils;
-import org.lwjgl.LWJGLException;
+import eu.thog92.lwjall.util.AudioBuffer;
+import eu.thog92.lwjall.util.Buffers;
 
-import java.io.IOException;
 import java.net.URL;
 import java.nio.FloatBuffer;
 
 public abstract class Source
 {
     protected final ICodecManager codecManager;
-    public    ICodec      codec;
-    protected IChannel channel;
-    protected AudioBuffer audioBuffer;
+    public          ICodec        codec;
+    protected       IChannel      channel;
+    protected       AudioBuffer   audioBuffer;
     // TODO: Vector?
-    protected FloatBuffer position;
-    protected FloatBuffer velocity;
+    protected       FloatBuffer   position;
+    protected       FloatBuffer   velocity;
     String name;
     private float pitch;
     private float distanceFromListener;
-    private float gain = 1.0F;
-    private float volume = 1.0F;
+    private float   gain    = 1.0F;
+    private float   volume  = 1.0F;
     /**
      * False when this source gets culled.
      */
-    private boolean active = true;
+    private boolean active  = true;
     /**
      * Whether or not this source has been stopped.
      */
@@ -32,13 +31,15 @@ public abstract class Source
     /**
      * Whether or not this source has been paused.
      */
-    private boolean paused = false;
+    private boolean paused  = false;
 
-    public Source(ICodecManager codecManager)
+    public Source(ICodecManager codecManager, String sourceName, IChannel channel)
     {
         this.codecManager = codecManager;
-        position = BufferUtils.createFloatBuffer(3);
-        velocity = BufferUtils.createFloatBuffer(3);
+        position = Buffers.createFloatBuffer(3);
+        velocity = Buffers.createFloatBuffer(3);
+        this.name = sourceName;
+        this.channel = channel;
     }
 
     public float getPitch()
@@ -114,10 +115,15 @@ public abstract class Source
         return name;
     }
 
-    public abstract void setup(URL url, String type) throws IOException, LWJGLException;
+    public abstract void setup(URL url, String type) throws Exception;
 
     public void update()
     {
         ;
+    }
+
+    public IChannel getChannel()
+    {
+        return channel;
     }
 }

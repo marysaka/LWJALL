@@ -1,9 +1,13 @@
 package eu.thog92.lwjall;
 
+import eu.thog92.lwjall.api.IChannel;
+import eu.thog92.lwjall.api.ICodecManager;
+import eu.thog92.lwjall.api.ISoundProvider;
+import eu.thog92.lwjall.api.Source;
 import eu.thog92.lwjall.codecs.VorbisCodec;
 import eu.thog92.lwjall.codecs.WaveCodec;
-import eu.thog92.lwjall.sources.DirectSource;
-import eu.thog92.lwjall.sources.StreamingSource;
+import eu.thog92.lwjall.internal.sources.DirectSource;
+import eu.thog92.lwjall.internal.sources.StreamingSource;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.LWJGLException;
@@ -209,7 +213,7 @@ public class ALSoundProvider implements ISoundProvider, Runnable
         {
             throw new NullPointerException("The source " + sourceName + " does not exist");
         }
-        source.channel.play();
+        source.getChannel().play();
     }
 
     @Override
@@ -225,23 +229,18 @@ public class ALSoundProvider implements ISoundProvider, Runnable
         Source source = null;
         if(streaming)
         {
-            source = new StreamingSource(codecManager);
+            source = new StreamingSource(codecManager, sourceName, freeChannel());
         }
         else
         {
-            source = new DirectSource(codecManager);
+            source = new DirectSource(codecManager, sourceName, freeChannel());
         }
-        source.name = sourceName;
-        source.channel = freeChannel();
+
         try
         {
             source.setup(url, type);
         }
-        catch(IOException e)
-        {
-            e.printStackTrace();
-        }
-        catch(LWJGLException e)
+        catch(Exception e)
         {
             e.printStackTrace();
         }
@@ -273,7 +272,7 @@ public class ALSoundProvider implements ISoundProvider, Runnable
         Source source = sources.get(sourceName);
         if(source != null)
         {
-            return source.channel.isPlaying();
+            return source.getChannel().isPlaying();
         }
         return false;
     }

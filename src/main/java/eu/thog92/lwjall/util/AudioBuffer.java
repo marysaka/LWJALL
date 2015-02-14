@@ -1,4 +1,4 @@
-package eu.thog92.lwjall;
+package eu.thog92.lwjall.util;
 
 import java.nio.ByteBuffer;
 

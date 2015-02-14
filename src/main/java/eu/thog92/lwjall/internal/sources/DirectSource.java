@@ -1,19 +1,15 @@
-package eu.thog92.lwjall.sources;
+package eu.thog92.lwjall.internal.sources;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
-import java.nio.ByteBuffer;
 
 import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
-import eu.thog92.lwjall.ICodec;
-import eu.thog92.lwjall.ICodecManager;
-import eu.thog92.lwjall.Source;
-import eu.thog92.lwjall.util.Buffers;
+import eu.thog92.lwjall.api.IChannel;
+import eu.thog92.lwjall.api.ICodec;
+import eu.thog92.lwjall.api.ICodecManager;
+import eu.thog92.lwjall.api.Source;
 
 import org.lwjgl.LWJGLException;
 import org.lwjgl.openal.AL10;
@@ -21,9 +17,9 @@ import org.lwjgl.openal.AL10;
 public class DirectSource extends Source
 {
 
-    public DirectSource(ICodecManager codecManager)
+    public DirectSource(ICodecManager codecManager, String sourceName, IChannel channel)
     {
-        super(codecManager);
+        super(codecManager, sourceName, channel);
     }
 
     @Override

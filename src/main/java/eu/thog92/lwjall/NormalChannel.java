@@ -1,5 +1,6 @@
 package eu.thog92.lwjall;
 
+import eu.thog92.lwjall.api.IChannel;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.openal.AL10;

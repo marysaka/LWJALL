@@ -1,5 +1,8 @@
 package eu.thog92.lwjall;
 
+import eu.thog92.lwjall.api.ICodec;
+import eu.thog92.lwjall.api.ICodecManager;
+
 import java.util.HashMap;
 import java.util.Map;
 

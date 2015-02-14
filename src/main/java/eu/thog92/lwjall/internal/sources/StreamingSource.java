@@ -1,11 +1,10 @@
-package eu.thog92.lwjall.sources;
+package eu.thog92.lwjall.internal.sources;
 
-import eu.thog92.lwjall.ICodecManager;
-import eu.thog92.lwjall.Source;
+import eu.thog92.lwjall.api.IChannel;
+import eu.thog92.lwjall.api.ICodecManager;
+import eu.thog92.lwjall.api.Source;
 import org.lwjgl.openal.AL10;
 
-import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.IOException;
 import java.net.URL;
@@ -19,9 +18,9 @@ public class StreamingSource extends Source
     private boolean eof;
     private boolean gainChange;
 
-    public StreamingSource(ICodecManager codecManager)
+    public StreamingSource(ICodecManager codecManager, String sourceName, IChannel channel)
     {
-        super(codecManager);
+        super(codecManager, sourceName, channel);
     }
 
     @Override

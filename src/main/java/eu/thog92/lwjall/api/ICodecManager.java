@@ -1,4 +1,4 @@
-package eu.thog92.lwjall;
+package eu.thog92.lwjall.api;
 
 /**
  * Created by Thog92 on 13/02/2015.

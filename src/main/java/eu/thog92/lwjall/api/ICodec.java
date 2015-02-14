@@ -1,10 +1,11 @@
-package eu.thog92.lwjall;
+package eu.thog92.lwjall.api;
+
+import eu.thog92.lwjall.util.AudioBuffer;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 
 public interface ICodec

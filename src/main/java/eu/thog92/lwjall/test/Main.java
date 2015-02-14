@@ -1,8 +1,8 @@
 package eu.thog92.lwjall.test;
 
 import eu.thog92.lwjall.ALSoundProvider;
-import eu.thog92.lwjall.ISoundProvider;
-import eu.thog92.lwjall.Source;
+import eu.thog92.lwjall.api.ISoundProvider;
+import eu.thog92.lwjall.api.Source;
 import org.lwjgl.LWJGLException;
 
 import java.io.File;
