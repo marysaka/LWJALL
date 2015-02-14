@@ -30,9 +30,9 @@ public interface ISoundProvider
 
     boolean isPlaying(String test);
 
-    Source newSource(String sourceName, URL url, boolean streaming);
+    AbstractSource newSource(String sourceName, URL url, boolean streaming);
 
-    Source newSource(String sourceName, URL url, String type, boolean streaming);
+    AbstractSource newSource(String sourceName, URL url, String type, boolean streaming);
 
     ICodecManager getCodecManager();
 }

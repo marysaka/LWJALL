@@ -9,12 +9,11 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 import eu.thog92.lwjall.api.IChannel;
 import eu.thog92.lwjall.api.ICodec;
 import eu.thog92.lwjall.api.ICodecManager;
-import eu.thog92.lwjall.api.Source;
+import eu.thog92.lwjall.api.AbstractSource;
 
-import org.lwjgl.LWJGLException;
 import org.lwjgl.openal.AL10;
 
-public class DirectSource extends Source
+public class DirectSource extends AbstractSource
 {
 
     public DirectSource(ICodecManager codecManager, String sourceName, IChannel channel)

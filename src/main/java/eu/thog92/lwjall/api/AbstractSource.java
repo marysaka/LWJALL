@@ -5,7 +5,7 @@ import eu.thog92.lwjall.util.Buffers;
 import java.net.URL;
 import java.nio.FloatBuffer;
 
-public abstract class Source
+public abstract class AbstractSource
 {
     protected final ICodecManager codecManager;
     public          ICodec        codec;
@@ -32,7 +32,7 @@ public abstract class Source
      */
     private boolean paused  = false;
 
-    public Source(ICodecManager codecManager, String sourceName, IChannel channel)
+    public AbstractSource(ICodecManager codecManager, String sourceName, IChannel channel)
     {
         this.codecManager = codecManager;
         position = Buffers.createFloatBuffer(3);

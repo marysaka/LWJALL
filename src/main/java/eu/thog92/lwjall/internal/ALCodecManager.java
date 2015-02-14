@@ -1,4 +1,4 @@
-package eu.thog92.lwjall;
+package eu.thog92.lwjall.internal;
 
 import eu.thog92.lwjall.api.ICodec;
 import eu.thog92.lwjall.api.ICodecManager;
@@ -6,9 +6,6 @@ import eu.thog92.lwjall.api.ICodecManager;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by Thog92 on 13/02/2015.
- */
 public class ALCodecManager implements ICodecManager
 {
     private final Map<String, Class> supportedCodecs = new HashMap<String, Class>();

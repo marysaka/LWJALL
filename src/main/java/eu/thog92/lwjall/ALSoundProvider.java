@@ -3,9 +3,11 @@ package eu.thog92.lwjall;
 import eu.thog92.lwjall.api.IChannel;
 import eu.thog92.lwjall.api.ICodecManager;
 import eu.thog92.lwjall.api.ISoundProvider;
-import eu.thog92.lwjall.api.Source;
+import eu.thog92.lwjall.api.AbstractSource;
 import eu.thog92.lwjall.codecs.VorbisCodec;
 import eu.thog92.lwjall.codecs.WaveCodec;
+import eu.thog92.lwjall.internal.ALCodecManager;
+import eu.thog92.lwjall.internal.NormalChannel;
 import eu.thog92.lwjall.internal.sources.DirectSource;
 import eu.thog92.lwjall.internal.sources.StreamingSource;
 
@@ -14,7 +16,6 @@ import org.lwjgl.LWJGLException;
 import org.lwjgl.openal.AL;
 import org.lwjgl.openal.AL10;
 
-import java.io.IOException;
 import java.net.URL;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -25,6 +26,7 @@ import java.util.Map;
 
 public class ALSoundProvider implements ISoundProvider, Runnable
 {
+
     /**
      * Position of the listener in 3D space.
      */
@@ -44,7 +46,7 @@ public class ALSoundProvider implements ISoundProvider, Runnable
 
     private boolean supportPitch;
 
-    private Map<String, Source> sources;
+    private Map<String, AbstractSource> sources;
 
     private boolean running;
 
@@ -131,7 +133,7 @@ public class ALSoundProvider implements ISoundProvider, Runnable
         {
             this.supportPitch = true;
         }
-        sources = new HashMap<String, Source>();
+        sources = new HashMap<String, AbstractSource>();
 
         new Thread(this).start();
         System.out.println("LWJALL is ready!");
@@ -208,7 +210,7 @@ public class ALSoundProvider implements ISoundProvider, Runnable
     @Override
     public void play(String sourceName)
     {
-        Source source = sources.get(sourceName);
+        AbstractSource source = sources.get(sourceName);
         if(source == null)
         {
             throw new NullPointerException("The source " + sourceName + " does not exist");
@@ -217,16 +219,16 @@ public class ALSoundProvider implements ISoundProvider, Runnable
     }
 
     @Override
-    public Source newSource(String sourceName, URL url, boolean streaming)
+    public AbstractSource newSource(String sourceName, URL url, boolean streaming)
     {
         String type = url.getFile().substring(url.getFile().lastIndexOf("."));
         return newSource(sourceName, url, type, streaming);
     }
 
     @Override
-    public Source newSource(String sourceName, URL url, String type, boolean streaming)
+    public AbstractSource newSource(String sourceName, URL url, String type, boolean streaming)
     {
-        Source source = null;
+        AbstractSource source = null;
         if(streaming)
         {
             source = new StreamingSource(codecManager, sourceName, freeChannel());
@@ -269,7 +271,7 @@ public class ALSoundProvider implements ISoundProvider, Runnable
 
     public boolean isPlaying(String sourceName)
     {
-        Source source = sources.get(sourceName);
+        AbstractSource source = sources.get(sourceName);
         if(source != null)
         {
             return source.getChannel().isPlaying();
@@ -303,7 +305,7 @@ public class ALSoundProvider implements ISoundProvider, Runnable
 
     private void update()
     {
-        for(Source s : sources.values())
+        for(AbstractSource s : sources.values())
         {
             s.update();
         }

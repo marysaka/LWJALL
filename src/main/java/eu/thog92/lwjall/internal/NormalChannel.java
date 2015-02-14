@@ -1,4 +1,4 @@
-package eu.thog92.lwjall;
+package eu.thog92.lwjall.internal;
 
 import eu.thog92.lwjall.api.IChannel;
 import org.lwjgl.BufferUtils;
