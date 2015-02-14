@@ -102,6 +102,7 @@ public class VorbisCodec implements ICodec
         pcmIndex = new int[info.channels];
 
         initialized = true;
+
         return true;
     }
 
@@ -175,6 +176,7 @@ public class VorbisCodec implements ICodec
 
         currentIndex = syncState.buffer(bufferSize);
         buffer = syncState.data;
+
         return true;
     }
 
@@ -213,13 +215,14 @@ public class VorbisCodec implements ICodec
     public AudioBuffer read(int n) throws IOException
     {
         byte[] result = null;
-        for(int i = 0; i < n && !eof; i++ )
+        while(!eof && (result == null || result.length < 131072))
         {
             if(result == null)
                 result = readBuffer();
             else
                 result = Buffers.merge(result, readBuffer());
         }
+        if(result == null) return null;
         return new AudioBuffer(result, audioFormat);
     }
 
@@ -248,7 +251,7 @@ public class VorbisCodec implements ICodec
             case -1:
                 break;
 
-            case 1:
+            default:
                 streamState.pagein(page);
                 if(page.granulepos() == 0) // We have reached end of file
                 {
@@ -265,7 +268,7 @@ public class VorbisCodec implements ICodec
                         case -1:
                             break;
 
-                        case 1:
+                        default:
                             if(block.synthesis(packet) == 0) dspState.synthesis_blockin(block);
                             while((samples = dspState.synthesis_pcmout(pcmData, pcmIndex)) > 0)
                             {
@@ -294,7 +297,7 @@ public class VorbisCodec implements ICodec
                     }
                 }
 
-                if(page.eos() == 0) // We reached the end of the stream
+                if(page.eos() != 0) // We reached the end of the stream
                 {
                     eof = true;
                 }
@@ -312,7 +315,10 @@ public class VorbisCodec implements ICodec
             {
                 throw new IOException("Could not read buffer", e);
             }
-            if(bufferLength == -1) return data;
+            if(bufferLength == -1)
+            {
+                return data;
+            }
 
             syncState.wrote(bufferLength);
             if(bufferLength == 0) eof = true;
@@ -324,7 +330,7 @@ public class VorbisCodec implements ICodec
     @Override
     public AudioBuffer readAll() throws IOException
     {
-        byte[] result = new byte[0];
+        byte[] result = null;
         while(!eof)
         {
             result = Buffers.merge(result, readBuffer());

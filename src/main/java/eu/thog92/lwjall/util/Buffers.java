@@ -35,8 +35,8 @@ public final class Buffers
     public static byte[] merge(byte[]... arrays)
     {
         if(arrays == null || arrays.length == 0) return null;
-        byte[] result = null;
-        for(int i = 0; i < arrays.length; i++ )
+        byte[] result = arrays[0];
+        for(int i = 1; i < arrays.length; i++ )
         {
             result = merge(result, arrays[i], arrays[i].length);
         }
