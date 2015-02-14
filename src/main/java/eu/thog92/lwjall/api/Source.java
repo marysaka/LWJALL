@@ -1,6 +1,5 @@
 package eu.thog92.lwjall.api;
 
-import eu.thog92.lwjall.util.AudioBuffer;
 import eu.thog92.lwjall.util.Buffers;
 
 import java.net.URL;

@@ -21,7 +21,7 @@ import com.jcraft.jorbis.Info;
 
 import org.lwjgl.openal.AL10;
 
-import eu.thog92.lwjall.util.AudioBuffer;
+import eu.thog92.lwjall.api.AudioBuffer;
 import eu.thog92.lwjall.api.IChannel;
 import eu.thog92.lwjall.api.ICodec;
 import eu.thog92.lwjall.util.Buffers;

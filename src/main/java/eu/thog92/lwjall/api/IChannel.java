@@ -1,7 +1,5 @@
 package eu.thog92.lwjall.api;
 
-import org.lwjgl.LWJGLException;
-
 import javax.sound.sampled.AudioFormat;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
@@ -31,7 +29,7 @@ public interface IChannel
 
     float getPlayingDuration();
 
-    void setup(AudioFormat audioFormat, ByteBuffer buffer) throws LWJGLException;
+    void setup(AudioFormat audioFormat, ByteBuffer buffer) throws Exception;
 
     boolean hasStopped();
 

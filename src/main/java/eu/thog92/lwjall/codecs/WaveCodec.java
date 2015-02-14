@@ -10,7 +10,7 @@ import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
-import eu.thog92.lwjall.util.AudioBuffer;
+import eu.thog92.lwjall.api.AudioBuffer;
 import eu.thog92.lwjall.api.IChannel;
 import eu.thog92.lwjall.api.ICodec;
 

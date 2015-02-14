@@ -1,8 +1,5 @@
 package eu.thog92.lwjall.api;
 
-/**
- * Created by Thog92 on 13/02/2015.
- */
 public interface ICodecManager
 {
     void registerCodec(String type, Class<?> codecClass);

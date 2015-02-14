@@ -23,7 +23,7 @@ public class DirectSource extends Source
     }
 
     @Override
-    public void setup(URL url, String type) throws IOException, LWJGLException
+    public void setup(URL url, String type) throws Exception
     {
         System.out.println(url);
         ICodec codec = codecManager.getCodec(type);

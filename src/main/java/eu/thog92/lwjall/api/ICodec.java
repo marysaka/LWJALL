@@ -1,7 +1,5 @@
 package eu.thog92.lwjall.api;
 
-import eu.thog92.lwjall.util.AudioBuffer;
-
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
