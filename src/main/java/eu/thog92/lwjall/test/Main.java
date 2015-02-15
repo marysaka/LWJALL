@@ -1,31 +1,55 @@
 package eu.thog92.lwjall.test;
 
-import eu.thog92.lwjall.ALSoundProvider;
-import eu.thog92.lwjall.api.ISoundProvider;
-import eu.thog92.lwjall.api.AbstractSource;
-import org.lwjgl.LWJGLException;
-
 import java.io.File;
-import java.net.MalformedURLException;
 import java.net.URL;
 
-public class Main
+import eu.thog92.lwjall.ALSoundProvider;
+import eu.thog92.lwjall.api.AbstractSource;
+import eu.thog92.lwjall.api.ISoundProvider;
+
+public class Main implements Runnable
 {
-    public static void main(String[] args) throws LWJGLException, MalformedURLException, InterruptedException
+    public static void main(String[] args)
     {
-        ISoundProvider soundProvider = new ALSoundProvider();
+        new Thread(new Main()).start();
+    }
 
-        //URL url = new File("resources/test_mono_8000Hz_8bit_PCM.wav").toURI().toURL(); // file from http://download.wavetlan.com/SVV/Media/HTTP/test_mono_8000Hz_8bit_PCM.wav
-        URL url = new File("resources/test.ogg").toURI().toURL();
-        System.out.println("Preparing source");
-        AbstractSource source = soundProvider.newSource("test", url, "ogg", false);
-        source.setVolume(0.90F);
-        System.out.println("Starting to play");
-        soundProvider.play("test");
+    @Override
+    public void run()
+    {
+        try
+        {
+            ISoundProvider soundProvider = new ALSoundProvider();
+            URL url = new File("resources/test_mono_8000Hz_8bit_PCM.wav").toURI().toURL(); // file from http://download.wavetlan.com/SVV/Media/HTTP/test_mono_8000Hz_8bit_PCM.wav
+            //            URL url = new File("resources/test.ogg").toURI().toURL();
+            System.out.println("Preparing source");
+            AbstractSource source = soundProvider.newSource("test", url, true);
+            source.setVolume(0.90F);
+            System.out.println("Starting to play");
+            soundProvider.play("test");
 
-        while(soundProvider.isPlaying("test"))
-            ;
-        System.out.println("End of playing");
-        soundProvider.cleanUp();
+            float frequency = 60.f;
+            float period = 1.f / frequency;
+            long periodInMilli = (long)(period * 1000);
+            long startTime = System.currentTimeMillis();
+            while(soundProvider.isPlaying("test"))
+            {
+                long elapsed = System.currentTimeMillis() - startTime;
+                if(elapsed >= periodInMilli)
+                {
+                    for(int i = 0; i < elapsed / periodInMilli; i++ ) // If we skip a frame, run it
+                    {
+                        soundProvider.update();
+                    }
+                    startTime = System.currentTimeMillis();
+                }
+            }
+            System.out.println("End of playing");
+            soundProvider.cleanUp();
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 }

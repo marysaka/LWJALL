@@ -34,7 +34,6 @@ public class VorbisCodec implements ICodec
     private IChannel      channel;
     private InputStream   input;
     private URLConnection urlConnection;
-    private URL           url;
 
     // Jorbis stuff
     private int           bufferSize;
@@ -62,7 +61,6 @@ public class VorbisCodec implements ICodec
         this.channel = channel;
         initialized = true;
 
-        this.url = url;
         this.urlConnection = url.openConnection();
         this.input = urlConnection.getInputStream();
 
@@ -102,6 +100,8 @@ public class VorbisCodec implements ICodec
         pcmIndex = new int[info.channels];
 
         initialized = true;
+
+        channel.setAudioFormat(audioFormat);
 
         return true;
     }
@@ -354,6 +354,10 @@ public class VorbisCodec implements ICodec
     public void update(int buffersProcessed)
     {
         buffers -= buffersProcessed;
+        for(int i = 0; i < buffersProcessed; i++ )
+        {
+            AL10.alSourceUnqueueBuffers(channel.getSource(0));
+        }
         if(buffers == 0 && eof)
         {
             channel.stop();

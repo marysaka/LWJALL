@@ -32,6 +32,8 @@ public class WaveCodec implements ICodec
         this.input = url.openStream();
         this.channel = channel;
         format = AudioSystem.getAudioFileFormat(url).getFormat();
+
+        channel.setAudioFormat(format);
         return true;
     }
 
@@ -100,6 +102,10 @@ public class WaveCodec implements ICodec
     @Override
     public void update(int buffersProcessed)
     {
+        for(int i = 0; i < buffersProcessed; i++ )
+        {
+            AL10.alSourceUnqueueBuffers(channel.getSource(0));
+        }
         buffers -= buffersProcessed;
         if(buffers == 0 && eof)
         {

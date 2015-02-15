@@ -25,7 +25,7 @@ public class DirectSource extends AbstractSource
     public void setup(URL url, String type) throws Exception
     {
         System.out.println(url);
-        ICodec codec = codecManager.getCodec(type);
+        this.codec = codecManager.getCodec(type);
         try
         {
             codec.initialize(url, channel);

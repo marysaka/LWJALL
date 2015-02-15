@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ALSoundProvider implements ISoundProvider, Runnable
+public class ALSoundProvider implements ISoundProvider
 {
 
     /**
@@ -47,8 +47,6 @@ public class ALSoundProvider implements ISoundProvider, Runnable
     private boolean supportPitch;
 
     private Map<String, AbstractSource> sources;
-
-    private boolean running;
 
     private ALCodecManager codecManager;
 
@@ -135,7 +133,6 @@ public class ALSoundProvider implements ISoundProvider, Runnable
         }
         sources = new HashMap<String, AbstractSource>();
 
-        new Thread(this).start();
         System.out.println("LWJALL is ready!");
     }
 
@@ -201,7 +198,6 @@ public class ALSoundProvider implements ISoundProvider, Runnable
     @Override
     public void cleanUp()
     {
-        running = false;
         System.out.println("LWJALL shutting down...");
         AL.destroy();
         System.out.println("OpenAL destroyed");
@@ -221,7 +217,7 @@ public class ALSoundProvider implements ISoundProvider, Runnable
     @Override
     public AbstractSource newSource(String sourceName, URL url, boolean streaming)
     {
-        String type = url.getFile().substring(url.getFile().lastIndexOf("."));
+        String type = url.getFile().substring(url.getFile().lastIndexOf(".") + 1);
         return newSource(sourceName, url, type, streaming);
     }
 
@@ -279,31 +275,7 @@ public class ALSoundProvider implements ISoundProvider, Runnable
         return false;
     }
 
-    @Override
-    public void run()
-    {
-        float frequency = 20.f;
-        float period = 1.f / frequency;
-        long periodInMilli = (long) (period * 1000);
-        long totalTime = 0L;
-        long startTime = System.currentTimeMillis();
-        running = true;
-        while(running)
-        {
-            long elapsed = System.currentTimeMillis() - startTime;
-            if(elapsed >= periodInMilli)
-            {
-                for(int i = 0; i < elapsed / periodInMilli; i++) // If we skip a frame, run it
-                {
-                    update(); // TODO run frame
-                }
-                startTime = System.currentTimeMillis();
-            }
-            totalTime += elapsed;
-        }
-    }
-
-    private void update()
+    public void update()
     {
         for(AbstractSource s : sources.values())
         {
@@ -311,4 +283,8 @@ public class ALSoundProvider implements ISoundProvider, Runnable
         }
     }
 
+    public boolean supportsPitch()
+    {
+        return supportPitch;
+    }
 }

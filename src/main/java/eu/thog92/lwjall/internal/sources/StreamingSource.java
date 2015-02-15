@@ -12,7 +12,6 @@ import java.net.URL;
 public class StreamingSource extends AbstractSource
 {
 
-    //
     private String type;
 
     private boolean eof;
@@ -53,10 +52,6 @@ public class StreamingSource extends AbstractSource
             this.gainChange = false;
         }
         int buffersProcessed = AL10.alGetSourcei(channel.getSource(0), AL10.AL_BUFFERS_PROCESSED);
-        for(int i = 0; i < buffersProcessed; i++)
-        {
-            AL10.alSourceUnqueueBuffers(channel.getSource(0));
-        }
         codec.update(buffersProcessed);
     }
 

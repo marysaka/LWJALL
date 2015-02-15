@@ -11,8 +11,6 @@ import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
-// TODO: Streaming
-
 /**
  *
  */
@@ -266,10 +264,8 @@ public class NormalChannel implements IChannel
 
     public boolean addToBufferQueue(byte[] buffer)
     {
-
         ByteBuffer byteBuffer = (ByteBuffer) BufferUtils.createByteBuffer(
                 buffer.length).put(buffer).flip();
-
         IntBuffer intBuffer = BufferUtils.createIntBuffer(1);
 
         AL10.alSourceUnqueueBuffers(source.get(0), intBuffer);

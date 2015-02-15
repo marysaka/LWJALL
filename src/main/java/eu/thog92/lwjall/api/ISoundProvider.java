@@ -35,4 +35,8 @@ public interface ISoundProvider
     AbstractSource newSource(String sourceName, URL url, String type, boolean streaming);
 
     ICodecManager getCodecManager();
+
+    void update();
+
+    boolean supportsPitch();
 }
