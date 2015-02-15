@@ -196,7 +196,7 @@ public class ALSoundProvider implements ISoundProvider
     }
 
     @Override
-    public void cleanUp()
+    public void cleanup()
     {
         System.out.println("LWJALL shutting down...");
         AL.destroy();
@@ -265,6 +265,7 @@ public class ALSoundProvider implements ISoundProvider
         return null;
     }
 
+    @Override
     public boolean isPlaying(String sourceName)
     {
         AbstractSource source = sources.get(sourceName);
@@ -275,6 +276,7 @@ public class ALSoundProvider implements ISoundProvider
         return false;
     }
 
+    @Override
     public void update()
     {
         for(AbstractSource s : sources.values())
@@ -283,6 +285,7 @@ public class ALSoundProvider implements ISoundProvider
         }
     }
 
+    @Override
     public boolean supportsPitch()
     {
         return supportPitch;

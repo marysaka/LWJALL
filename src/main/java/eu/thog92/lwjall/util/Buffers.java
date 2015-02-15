@@ -9,9 +9,22 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 
+/**
+ * Utility class performing operations on stream and {@link ByteBuffer}
+ */
 public final class Buffers
 {
 
+    /**
+     * Reads the entire stream and stores it in a {@link ByteBuffer}
+     * 
+     * @param stream
+     *            The {@link InputStream} to read
+     * @return
+     *         A {@link ByteBuffer} containing the data from the stream
+     * @throws IOException
+     *             Thrown if anything wrong happens while reading the stream
+     */
     public static ByteBuffer consumeStream(InputStream stream) throws IOException
     {
         int i;
@@ -26,6 +39,15 @@ public final class Buffers
         return flippedByteBuffer(baos.toByteArray());
     }
 
+    /**
+     * Creates a flipped {@link ByteBuffer} from given byte array
+     * 
+     * @param byteArray
+     *            The array to store in a {@link ByteBuffer}
+     * @return
+     *         A {@link ByteBuffer} containing the data from given array
+     * @see {@link ByteBuffer#flip()}
+     */
     public static ByteBuffer flippedByteBuffer(byte[] byteArray)
     {
         ByteBuffer buffer = BufferUtils.createByteBuffer(byteArray.length);
@@ -34,6 +56,14 @@ public final class Buffers
         return buffer;
     }
 
+    /**
+     * Merges two arrays into one
+     * 
+     * @param arrays
+     *            The arrays to merge
+     * @return
+     *         An array containing all the data from given arrays or null if no arrays to given
+     */
     public static byte[] merge(byte[]... arrays)
     {
         if(arrays == null || arrays.length == 0) return null;
@@ -45,6 +75,18 @@ public final class Buffers
         return result;
     }
 
+    /**
+     * Merges two arrays into one
+     * 
+     * @param arrayOne
+     *            The first array
+     * @param arrayTwo
+     *            The second array
+     * @param arrayTwoBytes
+     *            The number of bytes to add from the second array
+     * @return
+     *         A merged array whose length is <code>arrayOne.length + arrayTwoBytes</code>
+     */
     public static byte[] merge(byte[] arrayOne, byte[] arrayTwo, int arrayTwoBytes)
     {
         int bytes = arrayTwoBytes;
@@ -83,7 +125,16 @@ public final class Buffers
         }
     }
 
-    public static FloatBuffer createFloatBuffer(int size) {
+    /**
+     * Creates a new {@link FloatBuffer}.
+     * 
+     * @param size
+     *            The number of elements
+     * @return
+     *         A new {@link FloatBuffer}
+     */
+    public static FloatBuffer createFloatBuffer(int size)
+    {
         return ByteBuffer.allocateDirect(size << 2).order(ByteOrder.nativeOrder()).asFloatBuffer();
     }
 }

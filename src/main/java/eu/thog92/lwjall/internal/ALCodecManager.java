@@ -1,21 +1,21 @@
 package eu.thog92.lwjall.internal;
 
-import eu.thog92.lwjall.api.ICodec;
-import eu.thog92.lwjall.api.ICodecManager;
-
 import java.util.HashMap;
 import java.util.Map;
 
+import eu.thog92.lwjall.api.ICodec;
+import eu.thog92.lwjall.api.ICodecManager;
+
 public class ALCodecManager implements ICodecManager
 {
-    private final Map<String, Class> supportedCodecs = new HashMap<String, Class>();
+    private final Map<String, Class<? extends ICodec>> supportedCodecs = new HashMap<String, Class<? extends ICodec>>();
 
     @Override
-    public void registerCodec(String type, Class<?> codecClass)
+    public void registerCodec(String type, Class<? extends ICodec> codecClass)
     {
         if(supportedCodecs.containsKey(type))
         {
-            System.err.println();
+            System.err.println("Tried to register"); // TODO: True logger
             return;
         }
         supportedCodecs.put(type, codecClass);
@@ -24,7 +24,6 @@ public class ALCodecManager implements ICodecManager
     @Override
     public ICodec getCodec(String type)
     {
-
         try
         {
             if(supportedCodecs.containsKey(type))

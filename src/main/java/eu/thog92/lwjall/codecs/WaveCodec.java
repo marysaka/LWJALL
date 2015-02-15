@@ -18,11 +18,35 @@ import org.lwjgl.openal.AL10;
 
 public class WaveCodec implements ICodec
 {
+
+    /**
+     * The format of the audio data
+     */
     private AudioFormat format;
+
+    /**
+     * Is the codec initialized?
+     */
     private boolean     isInitialized;
+
+    /**
+     * The input stream
+     */
     private InputStream input;
+
+    /**
+     * The channel used by the codec
+     */
     private IChannel    channel;
+
+    /**
+     * How many buffers loaded for streaming ?
+     */
     private int         buffers;
+
+    /**
+     * Did we reach End Of File ?
+     */
     private boolean     eof;
 
     @Override
@@ -37,6 +61,7 @@ public class WaveCodec implements ICodec
         return true;
     }
 
+    @Override
     public boolean prepareBuffers(int n) throws IOException
     {
         if(input.available() <= 0)

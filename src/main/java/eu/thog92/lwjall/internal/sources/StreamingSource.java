@@ -12,11 +12,6 @@ import java.net.URL;
 public class StreamingSource extends AbstractSource
 {
 
-    private String type;
-
-    private boolean eof;
-    private boolean gainChange;
-
     public StreamingSource(ICodecManager codecManager, String sourceName, IChannel channel)
     {
         super(codecManager, sourceName, channel);
@@ -25,7 +20,6 @@ public class StreamingSource extends AbstractSource
     @Override
     public void setup(URL url, String type) throws IOException
     {
-        this.type = type;
         this.codec = codecManager.getCodec(type);
 
         if(codec == null)
@@ -46,20 +40,8 @@ public class StreamingSource extends AbstractSource
     @Override
     public void update()
     {
-        if(gainChange)
-        {
-            AL10.alSourcef(channel.getSource(0), AL10.AL_GAIN, (getGain() * getVolume()));
-            this.gainChange = false;
-        }
         int buffersProcessed = AL10.alGetSourcei(channel.getSource(0), AL10.AL_BUFFERS_PROCESSED);
         codec.update(buffersProcessed);
-    }
-
-    @Override
-    public void setVolume(float volume)
-    {
-        super.setVolume(volume);
-        this.gainChange = true;
     }
 
 }

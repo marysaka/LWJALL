@@ -29,10 +29,29 @@ import eu.thog92.lwjall.util.Buffers;
 public class VorbisCodec implements ICodec
 {
 
+    /**
+     * Is the codec initialized ?
+     */
     private boolean       initialized;
+
+    /**
+     * Did we reach End Of File?
+     */
     private boolean       eof;
+
+    /**
+     * The channel used by this codec
+     */
     private IChannel      channel;
+
+    /**
+     * The input stream
+     */
     private InputStream   input;
+
+    /**
+     * The connection from which to fetch the input
+     */
     private URLConnection urlConnection;
 
     // Jorbis stuff
@@ -49,10 +68,18 @@ public class VorbisCodec implements ICodec
     private Page          page;
     private Packet        packet;
     private int           convertedSize;
-    private AudioFormat   audioFormat;
     private float[][][]   pcmData;
     private int[]         pcmIndex;
     private byte[]        convertedBuffer;
+
+    /**
+     * The format of the audio data
+     */
+    private AudioFormat   audioFormat;
+
+    /**
+     * How many buffers are currently loaded for streaming ?
+     */
     private int           buffers;
 
     @Override
@@ -106,6 +133,14 @@ public class VorbisCodec implements ICodec
         return true;
     }
 
+    /**
+     * Fetches the header of the Vorbis file
+     * 
+     * @return
+     *         <code>true</code> if the header was found, <code>false</code> if not
+     * @throws IOException
+     *             Thrown if anything happened while reading through the stream
+     */
     private boolean fetchHeader() throws IOException
     {
         currentIndex = syncState.buffer(bufferSize);
@@ -115,7 +150,7 @@ public class VorbisCodec implements ICodec
         syncState.wrote(bytes);
         if(syncState.pageout(page) != 1)
         {
-            if(bytes < bufferSize) return true; // We read all the file
+            if(bytes < bufferSize) return true; // We've read all the file
             return false; // Invalid header
         }
 
@@ -226,6 +261,14 @@ public class VorbisCodec implements ICodec
         return new AudioBuffer(result, audioFormat);
     }
 
+    /**
+     * Reads a buffer worth of data
+     * 
+     * @return
+     *         A byte array containing the audio data
+     * @throws IOException
+     *             Thrown if any error happened while reading through the stream
+     */
     private byte[] readBuffer() throws IOException
     {
         if(!initialized)

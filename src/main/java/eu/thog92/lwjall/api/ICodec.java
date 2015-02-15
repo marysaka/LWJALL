@@ -3,20 +3,27 @@ package eu.thog92.lwjall.api;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
+import eu.thog92.lwjall.internal.sources.StreamingSource;
+
 import java.io.IOException;
 import java.net.URL;
 
 public interface ICodec
 {
     /**
-     * Should make any preperations required before reading from the audio stream.
+     * Should make any preparations required before reading from the audio stream.
      * If another stream is already opened, it should be closed and a new audio
      * stream opened in its place. This method is used internally
      * not only to initialize a stream, but also to rewind streams and to switch
      * stream sources on the fly.
      * 
+     * @param url
+     *            The {@link URL} from which to fetch the audio data
+     * @param channel
+     *            The {@link IChannel} in which to prepare the audio data
      * @return False if an error occurred or if end of stream was reached.
      * @throws UnsupportedAudioFileException
+     *             Thrown if the file given via the <code>url</code> parameter is not supported by this codec
      */
     boolean initialize(URL url, IChannel channel) throws IOException, UnsupportedAudioFileException;
 
@@ -29,6 +36,12 @@ public interface ICodec
      */
     boolean initialized();
 
+    /**
+     * Disposes all resources used by this codec, including the stream
+     * 
+     * @throws IOException
+     *             Thrown in case the stream couldn't be closed correctly
+     */
     void cleanup() throws IOException;
 
     /**
@@ -52,16 +65,37 @@ public interface ICodec
     AudioBuffer readAll() throws IOException;
 
     /**
-     * Should return the audio format of the data being returned by the read() and
-     * readAll() methods.
-     * @return Information wrapped into an AudioFormat context.
+     * Returns the audio format of the data being returned by the {@link ICodec#read(int)} and {@link ICodec#readAll()} methods.
+     * 
+     * @return The {@link AudioFormat} of the data.
      */
     AudioFormat getAudioFormat();
 
+    /**
+     * Sets the {@link AudioFormat} of the codec
+     * 
+     * @param format
+     *            The new format
+     */
     void setAudioFormat(AudioFormat format);
 
+    /**
+     * Updates the codec. Mostly used in {@link StreamingSource}.
+     * 
+     * @param buffersProcessed
+     *            The number of buffers processed since last call
+     */
     void update(int buffersProcessed);
 
+    /**
+     * Prepares <code>n</code> buffers to be used next while streaming
+     * @param n
+     *            The number of buffers to prepare
+     * @return
+     *         True if the end of stream/file has been reached
+     * @throws IOException
+     *             Exception thrown if any error occured while reading in the stream
+     */
     boolean prepareBuffers(int n) throws IOException;
 
 }

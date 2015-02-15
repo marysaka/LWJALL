@@ -221,6 +221,7 @@ public class NormalChannel implements IChannel
     public void setGain(float gain)
     {
         this.gain = gain;
+        AL10.alSourcef(source.get(0), AL10.AL_GAIN, gain);
     }
 
     @Override
