@@ -4,7 +4,8 @@ apply plugin: 'idea'
 
 group = 'eu.thog92'
 archivesBaseName = 'lwjall'
-version = '0.0.1-SNAPSHOT'
+version = appVersion;
+
 
 configurations {natives}
 
@@ -16,11 +17,21 @@ repositories {
     mavenCentral()
 }
 
+if (System.env.BUILD_NUMBER != null)  version = "$version.$System.env.BUILD_NUMBER"
+
 dependencies {
 	compile 'org.jcraft:jorbis:0.0.17'
     compile 'org.lwjgl.lwjgl:lwjgl:2.9.3'
     natives 'org.lwjgl.lwjgl:lwjgl-platform:2.9.3'
 }
+
+// JAR manifest configuration
+jar.manifest.mainAttributes(
+    "Built-By": System.properties['user.name'],
+    "Created-By": System.properties['java.vm.version'] + " (" + System.properties['java.vm.vendor'] + ")",
+    "Implementation-Title": archivesBaseName,
+    "Implementation-Version": version,
+    "Implementation-Vendor": "Thog and jglrxavpok")
 
 platforms.each {platform ->
     task "${platform}Natives" {
@@ -43,4 +54,13 @@ platforms.each {platform ->
 task natives {
     description "Copies native libraries to an appropriate directory."
     dependsOn platforms.collect {"${it}Natives"}.findAll {tasks[it]}
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.java
+}
+
+artifacts {
+    archives sourcesJar
 }
