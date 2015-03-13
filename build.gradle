@@ -28,10 +28,7 @@ dependencies {
 // JAR manifest configuration
 jar.manifest.mainAttributes(
     "Built-By": System.properties['user.name'],
-    "Created-By": System.properties['java.vm.version'] + " (" + System.properties['java.vm.vendor'] + ")",
-    "Implementation-Title": archivesBaseName,
-    "Implementation-Version": version,
-    "Implementation-Vendor": "Thog and jglrxavpok")
+    "Created-By": System.properties['java.vm.version'] + " (" + System.properties['java.vm.vendor'] + ")")
 
 platforms.each {platform ->
     task "${platform}Natives" {
