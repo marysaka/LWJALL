@@ -50,6 +50,8 @@ public class ALSoundProvider implements ISoundProvider
 
     private ALCodecManager codecManager;
 
+    private float masterGain = 1.0F;
+
     public ALSoundProvider() throws LWJGLException
     {
         AL.create();
@@ -227,11 +229,11 @@ public class ALSoundProvider implements ISoundProvider
         AbstractSource source = null;
         if(streaming)
         {
-            source = new StreamingSource(codecManager, sourceName, freeChannel());
+            source = new StreamingSource(this, sourceName, freeChannel());
         }
         else
         {
-            source = new DirectSource(codecManager, sourceName, freeChannel());
+            source = new DirectSource(this, sourceName, freeChannel());
         }
 
         try
@@ -289,5 +291,20 @@ public class ALSoundProvider implements ISoundProvider
     public boolean supportsPitch()
     {
         return supportPitch;
+    }
+
+    @Override public void setMasterGain(float gain)
+    {
+        this.masterGain = gain;
+
+        for(AbstractSource s : sources.values())
+        {
+            s.setGain(s.getGain());
+        }
+    }
+
+    @Override public float getMasterGain()
+    {
+        return masterGain;
     }
 }

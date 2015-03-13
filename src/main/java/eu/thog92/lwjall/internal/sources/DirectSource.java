@@ -10,14 +10,15 @@ import eu.thog92.lwjall.api.AbstractSource;
 import eu.thog92.lwjall.api.IChannel;
 import eu.thog92.lwjall.api.ICodecManager;
 
+import eu.thog92.lwjall.api.ISoundProvider;
 import org.lwjgl.openal.AL10;
 
 public class DirectSource extends AbstractSource
 {
 
-    public DirectSource(ICodecManager codecManager, String sourceName, IChannel channel)
+    public DirectSource(ISoundProvider soundProvider, String sourceName, IChannel channel)
     {
-        super(codecManager, sourceName, channel);
+        super(soundProvider, sourceName, channel);
     }
 
     @Override
@@ -42,7 +43,7 @@ public class DirectSource extends AbstractSource
         super.setGain(volume);
         if(channel != null)
         {
-            AL10.alSourcef(channel.getSource(0), AL10.AL_GAIN, (getGain())); // TODO: master gain
+            AL10.alSourcef(channel.getSource(0), AL10.AL_GAIN, (getGain()));
         }
     }
 

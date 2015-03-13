@@ -113,4 +113,19 @@ public interface ISoundProvider
      *         <code>true</code> if pitch is supported, <code>false</code> if not
      */
     boolean supportsPitch();
+
+
+    /**
+     * Sets the gain of the all playing sources. Ranges from 0 to 1
+     */
+    void setMasterGain(float gain);
+
+
+    /**
+     * Returns the global gain
+     *
+     * @return
+     *         The global gain
+     */
+    float getMasterGain();
 }

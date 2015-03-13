@@ -24,7 +24,7 @@ public class Main implements Runnable
             //            URL url = new File("resources/test.ogg").toURI().toURL();
             System.out.println("Preparing source");
             AbstractSource source = soundProvider.newSource("test", url, true);
-            source.setGain(0.90F);
+            soundProvider.setMasterGain(0.90F);
             System.out.println("Starting to play");
             soundProvider.play("test");
 

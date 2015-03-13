@@ -3,6 +3,7 @@ package eu.thog92.lwjall.internal.sources;
 import eu.thog92.lwjall.api.IChannel;
 import eu.thog92.lwjall.api.ICodecManager;
 import eu.thog92.lwjall.api.AbstractSource;
+import eu.thog92.lwjall.api.ISoundProvider;
 import org.lwjgl.openal.AL10;
 
 import javax.sound.sampled.UnsupportedAudioFileException;
@@ -12,9 +13,9 @@ import java.net.URL;
 public class StreamingSource extends AbstractSource
 {
 
-    public StreamingSource(ICodecManager codecManager, String sourceName, IChannel channel)
+    public StreamingSource(ISoundProvider soundProvider, String sourceName, IChannel channel)
     {
-        super(codecManager, sourceName, channel);
+        super(soundProvider, sourceName, channel);
     }
 
     @Override

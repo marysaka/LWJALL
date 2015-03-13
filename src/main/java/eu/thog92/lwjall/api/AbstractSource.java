@@ -14,76 +14,82 @@ public abstract class AbstractSource
     /**
      * The {@link ICodecManager} used by this source
      */
-    protected final ICodecManager codecManager;
+    protected final ICodecManager  codecManager;
+
+    /**
+     * The {@link ISoundProvider} used by this source
+     */
+    protected final ISoundProvider soundProvider;
 
     /**
      * The {@link ICodec} used by this source
      */
-    protected ICodec              codec;
+    protected ICodec codec;
 
     /**
      * The {@link IChannel} used by this source
      */
-    protected IChannel            channel;
+    protected IChannel channel;
 
     /**
      * The position of the source
      */
-    protected FloatBuffer         position;
+    protected FloatBuffer position;
 
     /**
      * The velocity of the sound played by this source
      */
-    protected FloatBuffer         velocity;
+    protected FloatBuffer velocity;
 
     /**
      * The name of this source
      */
-    private String                name;
+    private String name;
 
     /**
      * The pitch of this source
      */
-    private float                 pitch;
+    private float pitch;
 
     /**
      * The distance from the listener
      */
-    private float                 distanceFromListener;
+    private float distanceFromListener;
 
     /**
      * The gain of this source
      */
-    private float                 gain    = 1.0F;
+    private float gain = 1.0F;
 
     /**
      * False when this source gets culled.
      */
-    private boolean               active  = true;
+    private boolean active = true;
 
     /**
      * Whether or not this source has been stopped.
      */
-    private boolean               stopped = true;
+    private boolean stopped = true;
 
     /**
      * Whether or not this source has been paused.
      */
-    private boolean               paused  = false;
+    private boolean paused = false;
 
     /**
      * Creates a new source
-     * 
-     * @param codecManager
-     *            The {@link ICodecManager} to use for this source
+     *
+     * @param soundProvider
+     *            The {@link ISoundProvider} to use for this source
      * @param sourceName
      *            The source name
      * @param channel
      *            The {@link IChannel} to use for this source
      */
-    public AbstractSource(ICodecManager codecManager, String sourceName, IChannel channel)
+    public AbstractSource(ISoundProvider soundProvider, String sourceName, IChannel channel)
     {
-        this.codecManager = codecManager;
+        this.soundProvider = soundProvider;
+        this.codecManager = soundProvider.getCodecManager();
         position = Buffers.createFloatBuffer(3);
         velocity = Buffers.createFloatBuffer(3);
         this.name = sourceName;
@@ -178,7 +184,7 @@ public abstract class AbstractSource
     public void setGain(float gain)
     {
         checkRange(gain, 0, 1);
-        this.gain = gain;
+        this.gain = gain * soundProvider.getMasterGain();
         if(channel != null) channel.setGain(gain);
     }
 
