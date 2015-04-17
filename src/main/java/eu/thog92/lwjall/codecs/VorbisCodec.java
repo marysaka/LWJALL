@@ -252,10 +252,11 @@ public class VorbisCodec implements ICodec
         byte[] result = null;
         while(!eof && (result == null || result.length < 131072))
         {
-            if(result == null)
+            byte[] temp = readBuffer();
+            if(result == null || temp == null)
                 result = readBuffer();
             else
-                result = Buffers.merge(result, readBuffer());
+                result = Buffers.merge(result, temp);
         }
         if(result == null) return null;
         return new AudioBuffer(result, audioFormat);
