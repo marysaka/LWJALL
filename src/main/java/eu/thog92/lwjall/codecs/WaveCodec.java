@@ -14,6 +14,7 @@ import eu.thog92.lwjall.api.AudioBuffer;
 import eu.thog92.lwjall.api.IChannel;
 import eu.thog92.lwjall.api.ICodec;
 
+import eu.thog92.lwjall.util.LWJALLException;
 import org.lwjgl.openal.AL10;
 
 public class WaveCodec implements ICodec
@@ -50,23 +51,31 @@ public class WaveCodec implements ICodec
     private boolean     eof;
 
     @Override
-    public boolean initialize(URL url, IChannel channel) throws IOException, UnsupportedAudioFileException
+    public boolean initialize(URL url, IChannel channel) throws LWJALLException
     {
         this.isInitialized = true;
-        this.input = url.openStream();
-        this.channel = channel;
-        format = AudioSystem.getAudioFileFormat(url).getFormat();
+        try {
+            this.input = url.openStream();
+            this.channel = channel;
+            format = AudioSystem.getAudioFileFormat(url).getFormat();
 
-        channel.setAudioFormat(format);
+            channel.setAudioFormat(format);
+        } catch (Exception e) {
+            throw new LWJALLException("Failed to init wave codec", e);
+        }
         return true;
     }
 
     @Override
-    public boolean prepareBuffers(int n) throws IOException
+    public boolean prepareBuffers(int n) throws LWJALLException
     {
-        if(input.available() <= 0)
-        {
-            return true;
+        try {
+            if(input.available() <= 0)
+            {
+                return true;
+            }
+        } catch (IOException e) {
+            throw new LWJALLException("Failed to prepare buffers", e);
         }
         for(int i = 0; i < n; i++)
         {
@@ -90,19 +99,28 @@ public class WaveCodec implements ICodec
     }
 
     @Override
-    public void cleanup() throws IOException
+    public void cleanup() throws LWJALLException
     {
         this.format = null;
         buffers = 0;
-        input.close();
+        try {
+            input.close();
+        } catch (IOException e) {
+            throw new LWJALLException("Failed to close stream", e);
+        }
     }
 
     @Override
-    public AudioBuffer read(int n) throws IOException
+    public AudioBuffer read(int n) throws LWJALLException
     {
         if(n < 0) throw new NegativeArraySizeException("Negative reading size asked: " + n);
         byte[] data = new byte[n];
-        int length = input.read(data);
+        int length = 0;
+        try {
+            length = input.read(data);
+        } catch (IOException e) {
+            throw new LWJALLException("Failed to read the sound file", e);
+        }
         if(length == -1)
         {
             return null;
@@ -125,42 +143,35 @@ public class WaveCodec implements ICodec
     }
 
     @Override
-    public void update(int buffersProcessed)
-    {
-        for(int i = 0; i < buffersProcessed; i++ )
+    public void update(int buffersProcessed) throws LWJALLException {
+        for(int i = 0; i < buffersProcessed && !eof; i++ )
         {
             AL10.alSourceUnqueueBuffers(channel.getSource(0));
+            eof = prepareBuffers(1);
+            channel.play();
         }
-        buffers -= buffersProcessed;
-        if(buffers == 0 && eof)
+        if(eof)
         {
             channel.stop();
-        }
-        if(buffers < 2)
-        {
-            try
-            {
-                eof = prepareBuffers(2);
-            }
-            catch(IOException e)
-            {
-                e.printStackTrace();
-            }
         }
     }
 
     @Override
-    public AudioBuffer readAll() throws IOException
+    public AudioBuffer readAll() throws LWJALLException
     {
         byte[] data = new byte[4096];
         int length;
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        while((length = input.read(data)) != -1)
-        {
-            out.write(data, 0, length);
+        try {
+            while((length = input.read(data)) != -1)
+            {
+                out.write(data, 0, length);
+            }
+            out.flush();
+            out.close();
+        } catch (IOException e) {
+            throw new LWJALLException("Failed to read sound file", e);
         }
-        out.flush();
-        out.close();
         return new AudioBuffer(out.toByteArray(), getAudioFormat());
     }
 }
