@@ -2,6 +2,7 @@ package eu.thog92.lwjall.api;
 
 import eu.thog92.lwjall.internal.sources.StreamingSource;
 import eu.thog92.lwjall.util.Buffers;
+import eu.thog92.lwjall.util.LWJALLException;
 
 import java.net.URL;
 import java.nio.FloatBuffer;
@@ -86,14 +87,14 @@ public abstract class AbstractSource
      * @param channel
      *            The {@link IChannel} to use for this source
      */
-    public AbstractSource(ISoundProvider soundProvider, String sourceName, IChannel channel)
-    {
+    public AbstractSource(ISoundProvider soundProvider, String sourceName, IChannel channel) throws LWJALLException {
         this.soundProvider = soundProvider;
         this.codecManager = soundProvider.getCodecManager();
         position = Buffers.createFloatBuffer(3);
         velocity = Buffers.createFloatBuffer(3);
         this.name = sourceName;
         this.channel = channel;
+        setGain(1f);
     }
 
     /**
@@ -181,11 +182,10 @@ public abstract class AbstractSource
     /**
      * Sets the gain of the source. Ranges from 0 to 1
      */
-    public void setGain(float gain)
-    {
+    public void setGain(float gain) throws LWJALLException {
         checkRange(gain, 0, 1);
         this.gain = gain * soundProvider.getMasterGain();
-        if(channel != null) channel.setGain(gain);
+        if(channel != null) channel.setGain(this.gain);
     }
 
     /**
@@ -198,13 +198,12 @@ public abstract class AbstractSource
      * @param z
      *            Position on Z axis
      */
-    public void setPosition(float x, float y, float z)
-    {
+    public void setPosition(float x, float y, float z) throws LWJALLException {
         this.position.clear();
         this.position.put(new float[]
-        {
-                x, y, z
-        });
+                {
+                        x, y, z
+                });
 
         position.flip();
 
@@ -224,8 +223,7 @@ public abstract class AbstractSource
      * @param z
      *            Velocity on Z axis
      */
-    public void setVelocity(float x, float y, float z)
-    {
+    public void setVelocity(float x, float y, float z) throws LWJALLException {
         this.velocity.clear();
         this.velocity.put(new float[]
         {
@@ -277,10 +275,7 @@ public abstract class AbstractSource
     /**
      * Updates this sources. (Cycle in buffers in {@link StreamingSource} for instance
      */
-    public void update()
-    {
-        ;
-    }
+    public void update() throws LWJALLException {}
 
     /**
      * Returns the bound {@link IChannel}
@@ -291,5 +286,13 @@ public abstract class AbstractSource
     public IChannel getChannel()
     {
         return channel;
+    }
+
+    public void play() throws LWJALLException {
+        channel.play();
+    }
+
+    public boolean isPlaying() throws LWJALLException {
+        return channel.isPlaying();
     }
 }

@@ -11,6 +11,7 @@ import eu.thog92.lwjall.internal.NormalChannel;
 import eu.thog92.lwjall.internal.sources.DirectSource;
 import eu.thog92.lwjall.internal.sources.StreamingSource;
 
+import eu.thog92.lwjall.util.LWJALLException;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.openal.AL;
@@ -52,9 +53,12 @@ public class ALSoundProvider implements ISoundProvider
 
     private float masterGain = 1.0F;
 
-    public ALSoundProvider() throws LWJGLException
-    {
-        AL.create();
+    public ALSoundProvider() throws LWJALLException {
+        try {
+            AL.create();
+        } catch (LWJGLException e) {
+            throw new LWJALLException("Failed to load OpenAL", e);
+        }
         codecManager = new ALCodecManager();
         codecManager.registerCodec("wav", WaveCodec.class);
         codecManager.registerCodec("ogg", VorbisCodec.class);
@@ -63,7 +67,7 @@ public class ALSoundProvider implements ISoundProvider
         String errorMessage = checkALError();
         if(errorMessage != null)
         {
-            throw new LWJGLException("OpenAL did not initialize properly: " + errorMessage);
+            throw new LWJALLException("OpenAL did not initialize properly: " + errorMessage);
         }
 
         System.out.println("OpenAL initialized.");
@@ -102,7 +106,7 @@ public class ALSoundProvider implements ISoundProvider
 
         if(errorMessage != null)
         {
-            throw new LWJGLException("OpenAL did not initialize properly: " + errorMessage);
+            throw new LWJALLException("OpenAL did not initialize properly: " + errorMessage);
         }
 
         channels = new ArrayList<IChannel>();
@@ -159,8 +163,7 @@ public class ALSoundProvider implements ISoundProvider
         }
     }
 
-    private NormalChannel createNormalChannel()
-    {
+    private NormalChannel createNormalChannel() throws LWJALLException {
         IntBuffer source;
 
         source = BufferUtils.createIntBuffer(1);
@@ -206,8 +209,7 @@ public class ALSoundProvider implements ISoundProvider
     }
 
     @Override
-    public void play(String sourceName)
-    {
+    public void play(String sourceName) throws LWJALLException {
         AbstractSource source = sources.get(sourceName);
         if(source == null)
         {
@@ -217,15 +219,13 @@ public class ALSoundProvider implements ISoundProvider
     }
 
     @Override
-    public AbstractSource newSource(String sourceName, URL url, boolean streaming)
-    {
+    public AbstractSource newSource(String sourceName, URL url, boolean streaming) throws LWJALLException {
         String type = url.getFile().substring(url.getFile().lastIndexOf(".") + 1);
         return newSource(sourceName, url, type, streaming);
     }
 
     @Override
-    public AbstractSource newSource(String sourceName, URL url, String type, boolean streaming)
-    {
+    public AbstractSource newSource(String sourceName, URL url, String type, boolean streaming) throws LWJALLException {
         AbstractSource source = null;
         if(streaming)
         {
@@ -268,19 +268,16 @@ public class ALSoundProvider implements ISoundProvider
     }
 
     @Override
-    public boolean isPlaying(String sourceName)
-    {
+    public boolean isPlaying(String sourceName) throws LWJALLException {
         AbstractSource source = sources.get(sourceName);
-        if(source != null)
-        {
+        if(source != null) {
             return source.getChannel().isPlaying();
         }
         return false;
     }
 
     @Override
-    public void update()
-    {
+    public void update() throws LWJALLException {
         for(AbstractSource s : sources.values())
         {
             s.update();
@@ -293,8 +290,7 @@ public class ALSoundProvider implements ISoundProvider
         return supportPitch;
     }
 
-    @Override public void setMasterGain(float gain)
-    {
+    @Override public void setMasterGain(float gain) throws LWJALLException {
         this.masterGain = gain;
 
         for(AbstractSource s : sources.values())

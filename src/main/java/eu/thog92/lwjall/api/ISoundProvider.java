@@ -1,5 +1,7 @@
 package eu.thog92.lwjall.api;
 
+import eu.thog92.lwjall.util.LWJALLException;
+
 import java.net.URL;
 
 /*
@@ -51,7 +53,7 @@ public interface ISoundProvider
      * @throws NullPointerException
      *             Thrown if no source was found with given sourceName
      */
-    void play(String sourceName);
+    void play(String sourceName) throws LWJALLException;
 
     /**
      * Returns if the given source is playing
@@ -61,7 +63,7 @@ public interface ISoundProvider
      * @return
      *         <code>true</code> if the source is playing, <code>false</code> if not or if the source doesn't exist
      */
-    boolean isPlaying(String sourceName);
+    boolean isPlaying(String sourceName) throws LWJALLException;
 
     /**
      * Creates a new {@link AbstractSource}
@@ -75,7 +77,7 @@ public interface ISoundProvider
      * @return
      *         The new {@link AbstractSource}
      */
-    AbstractSource newSource(String sourceName, URL url, boolean streaming);
+    AbstractSource newSource(String sourceName, URL url, boolean streaming) throws LWJALLException;
 
     /**
      * Creates a new {@link AbstractSource}
@@ -91,7 +93,7 @@ public interface ISoundProvider
      * @return
      *         The new {@link AbstractSource}
      */
-    AbstractSource newSource(String sourceName, URL url, String type, boolean streaming);
+    AbstractSource newSource(String sourceName, URL url, String type, boolean streaming) throws LWJALLException;
 
     /**
      * The {@link ICodecManager} loaded by this provider
@@ -104,7 +106,7 @@ public interface ISoundProvider
     /**
      * Updates the provider
      */
-    void update();
+    void update() throws LWJALLException;
 
     /**
      * Returns if this provider support pitch
@@ -118,7 +120,7 @@ public interface ISoundProvider
     /**
      * Sets the gain of the all playing sources. Ranges from 0 to 1
      */
-    void setMasterGain(float gain);
+    void setMasterGain(float gain) throws LWJALLException;
 
 
     /**

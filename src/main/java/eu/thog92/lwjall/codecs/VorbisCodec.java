@@ -19,6 +19,7 @@ import com.jcraft.jorbis.Comment;
 import com.jcraft.jorbis.DspState;
 import com.jcraft.jorbis.Info;
 
+import eu.thog92.lwjall.util.LWJALLException;
 import org.lwjgl.openal.AL10;
 
 import eu.thog92.lwjall.api.AudioBuffer;
@@ -83,53 +84,57 @@ public class VorbisCodec implements ICodec
     private int           buffers;
 
     @Override
-    public boolean initialize(URL url, IChannel channel) throws IOException, UnsupportedAudioFileException
-    {
+    public boolean initialize(URL url, IChannel channel) throws LWJALLException {
         this.channel = channel;
         initialized = true;
 
-        this.urlConnection = url.openConnection();
-        this.input = urlConnection.getInputStream();
+        try {
+            this.urlConnection = url.openConnection();
+            this.input = urlConnection.getInputStream();
+            bufferSize = 4096 * 2;
+            currentIndex = 0;
+            bufferLength = 0;
+            buffer = null;
 
-        bufferSize = 4096 * 2;
-        currentIndex = 0;
-        bufferLength = 0;
-        buffer = null;
+            streamState = new StreamState();
+            dspState = new DspState();
+            block = new Block(dspState);
+            syncState = new SyncState();
+            comment = new Comment();
+            info = new Info();
+            page = new Page();
+            packet = new Packet();
 
-        streamState = new StreamState();
-        dspState = new DspState();
-        block = new Block(dspState);
-        syncState = new SyncState();
-        comment = new Comment();
-        info = new Info();
-        page = new Page();
-        packet = new Packet();
+            syncState.init();
+            syncState.buffer(bufferSize);
+            buffer = syncState.data;
 
-        syncState.init();
-        syncState.buffer(bufferSize);
-        buffer = syncState.data;
+            try {
+                if(!fetchHeader()) {
+                    throw new LWJALLException("Invalid file: Header could not be read");
+                }
+            } catch (IOException e) {
+                throw new LWJALLException("Failed to fetch reader", e);
+            }
 
-        if(!fetchHeader())
-        {
-            throw new UnsupportedAudioFileException("Header could not be read");
+            convertedSize = bufferSize * 2;
+            dspState.synthesis_init(info);
+            block.init(dspState);
+
+            int channels = info.channels;
+            int freq = info.rate;
+
+            audioFormat = new AudioFormat(freq, 16, channels, true, false);
+
+            pcmData = new float[1][][];
+            pcmIndex = new int[info.channels];
+
+            initialized = true;
+
+            channel.setAudioFormat(audioFormat);
+        } catch (IOException e) {
+            throw new LWJALLException("Failed to init codec", e);
         }
-
-        convertedSize = bufferSize * 2;
-        dspState.synthesis_init(info);
-        block.init(dspState);
-
-        int channels = info.channels;
-        int freq = info.rate;
-
-        audioFormat = new AudioFormat(freq, 16, channels, true, false);
-
-        pcmData = new float[1][][];
-        pcmIndex = new int[info.channels];
-
-        initialized = true;
-
-        channel.setAudioFormat(audioFormat);
-
         return true;
     }
 
@@ -222,7 +227,7 @@ public class VorbisCodec implements ICodec
     }
 
     @Override
-    public void cleanup() throws IOException
+    public void cleanup() throws LWJALLException
     {
         streamState.clear();
         block.clear();
@@ -247,14 +252,14 @@ public class VorbisCodec implements ICodec
     }
 
     @Override
-    public AudioBuffer read(int n) throws IOException
+    public AudioBuffer read(int n) throws LWJALLException
     {
         byte[] result = null;
         while(!eof && (result == null || result.length < 131072))
         {
             byte[] temp = readBuffer();
-            if(result == null || temp == null)
-                result = readBuffer();
+            if(result == null)
+                result = temp;
             else
                 result = Buffers.merge(result, temp);
         }
@@ -270,16 +275,16 @@ public class VorbisCodec implements ICodec
      * @throws IOException
      *             Thrown if any error happened while reading through the stream
      */
-    private byte[] readBuffer() throws IOException
+    private byte[] readBuffer() throws LWJALLException
     {
         if(!initialized)
         {
-            throw new IOException("Codec is not initialized yet!");
+            throw new LWJALLException("Codec is not initialized yet!");
         }
 
         if(eof)
         {
-            throw new EOFException("Codec has reached end of file");
+            throw new LWJALLException("Codec has reached end of file");
         }
 
         if(convertedBuffer == null) convertedBuffer = new byte[convertedSize];
@@ -357,10 +362,11 @@ public class VorbisCodec implements ICodec
             }
             catch(Exception e)
             {
-                throw new IOException("Could not read buffer", e);
+                throw new LWJALLException("Could not read buffer", e);
             }
             if(bufferLength == -1)
             {
+                eof = true;
                 return data;
             }
 
@@ -372,7 +378,7 @@ public class VorbisCodec implements ICodec
     }
 
     @Override
-    public AudioBuffer readAll() throws IOException
+    public AudioBuffer readAll() throws LWJALLException
     {
         byte[] result = null;
         while(!eof)
@@ -395,32 +401,21 @@ public class VorbisCodec implements ICodec
     }
 
     @Override
-    public void update(int buffersProcessed)
-    {
-        buffers -= buffersProcessed;
-        for(int i = 0; i < buffersProcessed; i++ )
+    public void update(int buffersProcessed) throws LWJALLException {
+        for(int i = 0; i < buffersProcessed && !eof; i++ )
         {
             AL10.alSourceUnqueueBuffers(channel.getSource(0));
+            eof = prepareBuffers(1);
+            channel.play();
         }
-        if(buffers == 0 && eof)
+        if(eof)
         {
             channel.stop();
-        }
-        if(buffers < 2)
-        {
-            try
-            {
-                eof = prepareBuffers(2);
-            }
-            catch(IOException e)
-            {
-                e.printStackTrace();
-            }
         }
     }
 
     @Override
-    public boolean prepareBuffers(int n) throws IOException
+    public boolean prepareBuffers(int n) throws LWJALLException
     {
         if(eof)
         {

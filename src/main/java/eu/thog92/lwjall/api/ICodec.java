@@ -4,6 +4,7 @@ import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
 import eu.thog92.lwjall.internal.sources.StreamingSource;
+import eu.thog92.lwjall.util.LWJALLException;
 
 import java.io.IOException;
 import java.net.URL;
@@ -25,7 +26,7 @@ public interface ICodec
      * @throws UnsupportedAudioFileException
      *             Thrown if the file given via the <code>url</code> parameter is not supported by this codec
      */
-    boolean initialize(URL url, IChannel channel) throws IOException, UnsupportedAudioFileException;
+    boolean initialize(URL url, IChannel channel) throws LWJALLException;
 
     /**
      * Should return false if the stream is busy initializing.  To prevent bad
@@ -42,7 +43,7 @@ public interface ICodec
      * @throws IOException
      *             Thrown in case the stream couldn't be closed correctly
      */
-    void cleanup() throws IOException;
+    void cleanup() throws LWJALLException;
 
     /**
      * Reads in the stream
@@ -53,7 +54,7 @@ public interface ICodec
      *         An AudioBuffer with the requested data
      * @throws IOException
      */
-    AudioBuffer read(int n) throws IOException;
+    AudioBuffer read(int n) throws LWJALLException;
 
     /**
      * Reads all data from the stream
@@ -62,7 +63,7 @@ public interface ICodec
      *         An AudioBuffer containing all the sound data
      * @throws IOException
      */
-    AudioBuffer readAll() throws IOException;
+    AudioBuffer readAll() throws LWJALLException;
 
     /**
      * Returns the audio format of the data being returned by the {@link ICodec#read(int)} and {@link ICodec#readAll()} methods.
@@ -85,7 +86,7 @@ public interface ICodec
      * @param buffersProcessed
      *            The number of buffers processed since last call
      */
-    void update(int buffersProcessed);
+    void update(int buffersProcessed) throws LWJALLException;
 
     /**
      * Prepares <code>n</code> buffers to be used next while streaming
@@ -96,6 +97,6 @@ public interface ICodec
      * @throws IOException
      *             Exception thrown if any error occured while reading in the stream
      */
-    boolean prepareBuffers(int n) throws IOException;
+    boolean prepareBuffers(int n) throws LWJALLException;
 
 }

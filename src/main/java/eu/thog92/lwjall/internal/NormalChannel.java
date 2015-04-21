@@ -1,6 +1,7 @@
 package eu.thog92.lwjall.internal;
 
 import eu.thog92.lwjall.api.IChannel;
+import eu.thog92.lwjall.util.LWJALLException;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.openal.AL10;
@@ -37,11 +38,10 @@ public class NormalChannel implements IChannel
 
     private float gain;
 
-    public NormalChannel(IntBuffer source)
-    {
+    public NormalChannel(IntBuffer source) throws LWJALLException {
         this.source = source;
         stopped = true;
-        gain = 1.f;
+        setGain(1f);
     }
 
     @Override
@@ -82,9 +82,8 @@ public class NormalChannel implements IChannel
     }
 
     @Override
-    public void setAudioFormat(AudioFormat audioFormat)
-    {
-        int soundFormat = 0;
+    public void setAudioFormat(AudioFormat audioFormat) throws LWJALLException {
+        int soundFormat;
         if(audioFormat.getChannels() == 1)
         {
             if(audioFormat.getSampleSizeInBits() == 8)
@@ -97,8 +96,7 @@ public class NormalChannel implements IChannel
             }
             else
             {
-                System.err.println("Illegal sample size in method " + "'setAudioFormat'");
-                return;
+                throw new LWJALLException("Illegal sample size in method 'setAudioFormat' ("+audioFormat.getSampleSizeInBits()+")");
             }
         }
         else if(audioFormat.getChannels() == 2)
@@ -113,50 +111,48 @@ public class NormalChannel implements IChannel
             }
             else
             {
-                System.err.println("Illegal sample size in method " + "'setAudioFormat'");
-                return;
+                throw new LWJALLException("Illegal sample size in method 'setAudioFormat' ("+audioFormat.getSampleSizeInBits()+")");
             }
         }
         else
         {
-            System.err.println("Audio data neither mono nor stereo in " + "method 'setAudioFormat'");
-            return;
+            throw new LWJALLException("Audio data neither mono nor stereo in " + "method 'setAudioFormat'");
         }
         format = soundFormat;
         sampleRate = (int) audioFormat.getSampleRate();
     }
 
     @Override
-    public void play()
-    {
+    public void play() throws LWJALLException {
         stopped = false;
-        AL10.alSourcef(source.get(0), AL10.AL_GAIN, 1);
         AL10.alSourcePlay(source.get(0));
+        checkALError("playing source");
     }
 
     @Override
-    public void pause()
-    {
+    public void pause() throws LWJALLException {
         AL10.alSourcePause(source.get(0));
+        checkALError("pausing source");
     }
 
     @Override
-    public void stop()
-    {
+    public void stop() throws LWJALLException {
         stopped = true;
         AL10.alSourceStop(source.get(0));
+        checkALError("stopping source");
     }
 
     @Override
-    public void rewind()
-    {
+    public void rewind() throws LWJALLException {
         AL10.alSourceRewind(source.get(0));
+        checkALError("rewinding source");
     }
 
     @Override
-    public boolean isPlaying()
-    {
-        return AL10.alGetSourcei(source.get(0), AL10.AL_SOURCE_STATE) == AL10.AL_PLAYING;
+    public boolean isPlaying() throws LWJALLException {
+        boolean state = AL10.alGetSourcei(source.get(0), AL10.AL_SOURCE_STATE) == AL10.AL_PLAYING;
+        checkALError("checking playing state");
+        return state;
     }
 
     @Override
@@ -185,24 +181,16 @@ public class NormalChannel implements IChannel
     }
 
     @Override
-    public void setup(AudioFormat audioFormat, ByteBuffer buffer) throws LWJGLException
-    {
+    public void setup(AudioFormat audioFormat, ByteBuffer buffer) throws LWJALLException {
         setAudioFormat(audioFormat);
         bufferPointer = AL10.alGenBuffers();
-        int error = AL10.alGetError();
-        if(error != AL10.AL_NO_ERROR)
-        {
-            throw new LWJGLException("Error while creating sound buffer: " + error);
-        }
+        checkALError("creating buffer");
+
         AL10.alBufferData(bufferPointer, format, buffer, sampleRate);
+        checkALError("filling buffer");
 
         AL10.alSourcei(source.get(0), AL10.AL_BUFFER, bufferPointer);
-
-        error = AL10.alGetError();
-        if(error != AL10.AL_NO_ERROR)
-        {
-            throw new LWJGLException("Error while uploading sound buffer: " + error);
-        }
+        checkALError("setting buffer pointer");
     }
 
     @Override
@@ -218,22 +206,22 @@ public class NormalChannel implements IChannel
     }
 
     @Override
-    public void setGain(float gain)
-    {
+    public void setGain(float gain) throws LWJALLException {
         this.gain = gain;
         AL10.alSourcef(source.get(0), AL10.AL_GAIN, gain);
+        checkALError("changing gain");
     }
 
     @Override
-    public void setVelocity(FloatBuffer velocity)
-    {
+    public void setVelocity(FloatBuffer velocity) throws LWJALLException {
         AL10.alSource(source.get(0), AL10.AL_VELOCITY, velocity);
+        checkALError("setting velocity");
     }
 
     @Override
-    public void setPosition(FloatBuffer pos)
-    {
+    public void setPosition(FloatBuffer pos) throws LWJALLException {
         AL10.alSource(source.get(0), AL10.AL_POSITION, pos);
+        checkALError("setting position");
     }
 
     @Override
@@ -242,52 +230,49 @@ public class NormalChannel implements IChannel
         return format;
     }
 
-    private String checkALError()
-    {
-        switch(AL10.alGetError())
-        {
+    private void checkALError(String reason) throws LWJALLException {
+        String error = null;
+        switch(AL10.alGetError()) {
             case AL10.AL_NO_ERROR:
-                return null;
+                break;
             case AL10.AL_INVALID_NAME:
-                return "Invalid name parameter.";
+                error = "Invalid name parameter";
+                break;
             case AL10.AL_INVALID_ENUM:
-                return "Invalid parameter.";
+                error = "Invalid parameter";
+                break;
             case AL10.AL_INVALID_VALUE:
-                return "Invalid enumerated parameter value.";
+                error = "Invalid enumerated parameter value";
+                break;
             case AL10.AL_INVALID_OPERATION:
-                return "Illegal call.";
+                error = "Illegal call";
+                break;
             case AL10.AL_OUT_OF_MEMORY:
-                return "Unable to allocate memory.";
+                error = "Unable to allocate memory";
+                break;
             default:
-                return "An unknow error occurred.";
+                error = "An unknown error occurred";
+                break;
+        }
+
+        if(error != null) {
+            throw new LWJALLException("OpenAL error: "+error+" when "+reason);
         }
     }
 
-    public boolean addToBufferQueue(byte[] buffer)
-    {
+    public boolean addToBufferQueue(byte[] buffer) throws LWJALLException {
         ByteBuffer byteBuffer = (ByteBuffer) BufferUtils.createByteBuffer(
                 buffer.length).put(buffer).flip();
         IntBuffer intBuffer = BufferUtils.createIntBuffer(1);
 
         AL10.alSourceUnqueueBuffers(source.get(0), intBuffer);
-        if(checkALError() != null)
-        {
-            return false;
-        }
-
-        checkALError();
+        checkALError("unqueuing buffer");
 
         AL10.alBufferData(intBuffer.get(0), format, byteBuffer, sampleRate);
-        if(checkALError() != null)
-        {
-            return false;
-        }
+        checkALError("filling buffer");
 
         AL10.alSourceQueueBuffers(source.get(0), intBuffer);
-        if(checkALError() != null)
-        {
-            return false;
-        }
+        checkALError("queuing buffer");
 
         return true;
     }

@@ -1,5 +1,7 @@
 package eu.thog92.lwjall.api;
 
+import eu.thog92.lwjall.util.LWJALLException;
+
 import javax.sound.sampled.AudioFormat;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
@@ -44,27 +46,27 @@ public interface IChannel
      * @param audioFormat
      *            The {@link AudioFormat} to set
      */
-    void setAudioFormat(AudioFormat audioFormat);
+    void setAudioFormat(AudioFormat audioFormat) throws LWJALLException;
 
     /**
      * Plays or resumes the current sound
      */
-    void play();
+    void play() throws LWJALLException;
 
     /**
      * Pauses the current sound
      */
-    void pause();
+    void pause() throws LWJALLException;
 
     /**
      * Stops the current sound
      */
-    void stop();
+    void stop() throws LWJALLException;
 
     /**
      * Rewinds the current sound
      */
-    void rewind();
+    void rewind() throws LWJALLException;
 
     /**
      * Returns if the channel is currently playing sound
@@ -72,7 +74,7 @@ public interface IChannel
      * @return
      *         <code>true</code> if the channel is playing sound, <code>false</code> if not
      */
-    boolean isPlaying();
+    boolean isPlaying() throws LWJALLException;
 
     /**
      * Returns for how long the channel has been playing
@@ -92,7 +94,7 @@ public interface IChannel
      * @throws Exception
      *             Thrown if anything wrong happens while setting up the channel
      */
-    void setup(AudioFormat audioFormat, ByteBuffer buffer) throws Exception;
+    void setup(AudioFormat audioFormat, ByteBuffer buffer) throws LWJALLException;
 
     /**
      * Returns if the channel has stopped playing or not
@@ -116,7 +118,7 @@ public interface IChannel
      * @param gain
      *            The new gain to set
      */
-    void setGain(float gain);
+    void setGain(float gain) throws LWJALLException;
 
     /**
      * Sets the velocity of the sound played by this channel
@@ -124,7 +126,7 @@ public interface IChannel
      * @param velocity
      *            The new velocity, stored in XYZ order
      */
-    void setVelocity(FloatBuffer velocity);
+    void setVelocity(FloatBuffer velocity) throws LWJALLException;
 
     /**
      * Sets the position of the sound played by this channel
@@ -132,7 +134,7 @@ public interface IChannel
      * @param pos
      *            The new position, stored in XYZ order
      */
-    void setPosition(FloatBuffer pos);
+    void setPosition(FloatBuffer pos) throws LWJALLException;
 
     /**
      * Returns the format of this channel
