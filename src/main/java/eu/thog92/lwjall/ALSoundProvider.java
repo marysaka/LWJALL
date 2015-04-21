@@ -254,8 +254,7 @@ public class ALSoundProvider implements ISoundProvider
         return codecManager;
     }
 
-    private IChannel freeChannel()
-    {
+    private IChannel freeChannel() throws LWJALLException {
         for(IChannel channel : channels)
         {
             if(channel.hasStopped())
@@ -263,8 +262,10 @@ public class ALSoundProvider implements ISoundProvider
                 return channel;
             }
         }
-        // TODO: Find a channel to use
-        return null;
+        // Panic, we don't have any more channels, so create a new one
+        IChannel newChannel = createNormalChannel();
+        channels.add(newChannel);
+        return newChannel;
     }
 
     @Override
