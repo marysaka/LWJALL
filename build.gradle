@@ -4,7 +4,7 @@ apply plugin: 'idea'
 
 group = 'eu.thog92'
 archivesBaseName = 'lwjall'
-version = appVersion;
+version = appVersion
 
 
 configurations {natives}
@@ -20,7 +20,7 @@ repositories {
 if (System.env.BUILD_NUMBER != null)  version = "$version.$System.env.BUILD_NUMBER"
 
 dependencies {
-	compile 'org.jcraft:jorbis:0.0.17'
+    compile 'org.jcraft:jorbis:0.0.17'
     compile 'org.lwjgl.lwjgl:lwjgl:2.9.3'
     natives 'org.lwjgl.lwjgl:lwjgl-platform:2.9.3'
 }
