@@ -3,6 +3,7 @@ package eu.thog92.lwjall.api;
 import eu.thog92.lwjall.internal.sources.StreamingSource;
 import eu.thog92.lwjall.util.Buffers;
 import eu.thog92.lwjall.util.LWJALLException;
+import org.joml.Vector3f;
 
 import java.net.URL;
 import java.nio.FloatBuffer;
@@ -182,10 +183,16 @@ public abstract class AbstractSource
     /**
      * Sets the gain of the source. Ranges from 0 to 1
      */
-    public void setGain(float gain) throws LWJALLException {
+    public void setGain(float gain) throws LWJALLException
+    {
         checkRange(gain, 0, 1);
         this.gain = gain * soundProvider.getMasterGain();
         if(channel != null) channel.setGain(this.gain);
+    }
+
+    public void setPosition(Vector3f pos) throws LWJALLException
+    {
+        setPosition(pos.x, pos.y, pos.z);
     }
 
     /**
@@ -198,19 +205,17 @@ public abstract class AbstractSource
      * @param z
      *            Position on Z axis
      */
-    public void setPosition(float x, float y, float z) throws LWJALLException {
-        this.position.clear();
-        this.position.put(new float[]
-                {
-                        x, y, z
-                });
-
-        position.flip();
-
+    public void setPosition(float x, float y, float z) throws LWJALLException
+    {
         if(channel != null)
         {
-            channel.setPosition(position);
+            channel.setPosition(x, y, z);
         }
+    }
+
+    public void setVelocity(Vector3f velocity) throws LWJALLException
+    {
+        setVelocity(velocity.x, velocity.y, velocity.z);
     }
 
     /**
@@ -223,18 +228,11 @@ public abstract class AbstractSource
      * @param z
      *            Velocity on Z axis
      */
-    public void setVelocity(float x, float y, float z) throws LWJALLException {
-        this.velocity.clear();
-        this.velocity.put(new float[]
-        {
-                x, y, z
-        });
-
-        velocity.flip();
-
+    public void setVelocity(float x, float y, float z) throws LWJALLException
+    {
         if(channel != null)
         {
-            channel.setVelocity(velocity);
+            channel.setVelocity(x, y, z);
         }
     }
 

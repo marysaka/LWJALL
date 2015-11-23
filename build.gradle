@@ -11,7 +11,7 @@ configurations {natives}
 
 def platforms = ['windows', 'linux', 'osx']
 
-sourceCompatibility = 1.6
+sourceCompatibility = 1.8
 
 repositories {
     mavenCentral()
@@ -19,10 +19,15 @@ repositories {
 
 if (System.env.BUILD_NUMBER != null)  version = "$version.$System.env.BUILD_NUMBER"
 
+project.ext.lwjglVersion = "3.0.0b"
+
 dependencies {
     compile 'org.jcraft:jorbis:0.0.17'
-    compile 'org.lwjgl.lwjgl:lwjgl:2.9.3'
-    natives 'org.lwjgl.lwjgl:lwjgl-platform:2.9.3'
+    compile 'org.joml:joml:1.6.5'
+    compile "org.lwjgl:lwjgl:${lwjglVersion}"
+    compile "org.lwjgl:lwjgl-platform:${lwjglVersion}:natives-windows"
+    compile "org.lwjgl:lwjgl-platform:${lwjglVersion}:natives-linux"
+    compile "org.lwjgl:lwjgl-platform:${lwjglVersion}:natives-osx"
 }
 
 // JAR manifest configuration

@@ -13,9 +13,8 @@ import eu.thog92.lwjall.internal.sources.StreamingSource;
 
 import eu.thog92.lwjall.util.LWJALLException;
 import org.lwjgl.BufferUtils;
-import org.lwjgl.LWJGLException;
-import org.lwjgl.openal.AL;
-import org.lwjgl.openal.AL10;
+import org.lwjgl.openal.*;
+import org.lwjgl.system.MemoryUtil;
 
 import java.net.URL;
 import java.nio.FloatBuffer;
@@ -54,11 +53,9 @@ public class ALSoundProvider implements ISoundProvider
     private float masterGain = 1.0F;
 
     public ALSoundProvider() throws LWJALLException {
-        try {
-            AL.create();
-        } catch (LWJGLException e) {
-            throw new LWJALLException("Failed to load OpenAL", e);
-        }
+        ALDevice device = ALDevice.create();
+        ALContext context = ALContext.create(device);
+        context.makeCurrentThread();
         codecManager = new ALCodecManager();
         codecManager.registerCodec("wav", WaveCodec.class);
         codecManager.registerCodec("ogg", VorbisCodec.class);
@@ -72,30 +69,20 @@ public class ALSoundProvider implements ISoundProvider
 
         System.out.println("OpenAL initialized.");
 
-        listenerPosition = BufferUtils.createFloatBuffer(3).put(new float[]
-                {
-                        0, 0, 0
-                });
         listenerOrientation = BufferUtils.createFloatBuffer(6).put(new float[]
                 {
                         0, 0, 0, 0, 0, 0
                 });
-        listenerVelocity = BufferUtils.createFloatBuffer(3).put(new float[]
-                {
-                        0, 0, 0
-                });
 
         // FLIP
-        listenerPosition.flip();
         listenerOrientation.flip();
-        listenerVelocity.flip();
 
         // Pass the buffers to the sound system, and check for potential errors:
-        AL10.alListener(AL10.AL_POSITION, listenerPosition);
+        setListenerLocation(0,0,0);
         errorMessage = checkALError();
-        AL10.alListener(AL10.AL_ORIENTATION, listenerOrientation);
+        setListenerOrientation(0,0,1,0,1,0);
         errorMessage = checkALError();
-        AL10.alListener(AL10.AL_VELOCITY, listenerVelocity);
+        setListenerVelocity(0,0,0);
         errorMessage = checkALError();
 
         AL10.alDopplerFactor(0.0F);
@@ -163,11 +150,9 @@ public class ALSoundProvider implements ISoundProvider
         }
     }
 
-    private NormalChannel createNormalChannel() throws LWJALLException {
-        IntBuffer source;
-
-        source = BufferUtils.createIntBuffer(1);
-        AL10.alGenSources(source);
+    private NormalChannel createNormalChannel() throws LWJALLException
+    {
+        int source = AL10.alGenSources();
 
         if(AL10.alGetError() != AL10.AL_NO_ERROR)
         {
@@ -177,17 +162,36 @@ public class ALSoundProvider implements ISoundProvider
         return new NormalChannel(source);
     }
 
+    /**
+     * Update OpenAL listener position
+     * @param x
+     *            The position of the listener on X axis
+     * @param y
+     *            The position of the listener on Y axis
+     * @param z
+     *            The position of the listener on Z axis
+     */
     @Override
     public void setListenerLocation(float x, float y, float z)
     {
-        listenerPosition.put(0, x);
-        listenerPosition.put(1, y);
-        listenerPosition.put(2, z);
-
-        // Update OpenAL listener position:
-        AL10.alListener(AL10.AL_POSITION, listenerPosition);
+        AL10.alListener3f(AL10.AL_POSITION, x, y, z);
     }
 
+    /**
+     * Sets the listener orientation
+     * @param lookX
+     *            X element of the look-at direction.
+     * @param lookY
+     *            Y element of the look-at direction.
+     * @param lookZ
+     *            Z element of the look-at direction.
+     * @param upX
+     *            X element of the up direction.
+     * @param upY
+     *            Y element of the up direction.
+     * @param upZ
+     *            Z element of the up direction.
+     */
     @Override
     public void setListenerOrientation(float lookX, float lookY, float lookZ, float upX, float upY, float upZ)
     {
@@ -197,19 +201,26 @@ public class ALSoundProvider implements ISoundProvider
         listenerOrientation.put(3, upX);
         listenerOrientation.put(4, upY);
         listenerOrientation.put(5, upZ);
-        AL10.alListener(AL10.AL_ORIENTATION, listenerOrientation);
+        AL10.alListenerfv(AL10.AL_ORIENTATION, listenerOrientation);
+    }
+
+    @Override
+    public void setListenerVelocity(float x, float y, float z)
+    {
+        AL10.alListenerfv(AL10.AL_VELOCITY, listenerOrientation);
     }
 
     @Override
     public void cleanup()
     {
         System.out.println("LWJALL shutting down...");
-        AL.destroy();
+        ALC.destroy();
         System.out.println("OpenAL destroyed");
     }
 
     @Override
-    public void play(String sourceName) throws LWJALLException {
+    public void play(String sourceName) throws LWJALLException
+    {
         AbstractSource source = sources.get(sourceName);
         if(source == null)
         {
@@ -219,13 +230,15 @@ public class ALSoundProvider implements ISoundProvider
     }
 
     @Override
-    public AbstractSource newSource(String sourceName, URL url, boolean streaming) throws LWJALLException {
+    public AbstractSource newSource(String sourceName, URL url, boolean streaming) throws LWJALLException
+    {
         String type = url.getFile().substring(url.getFile().lastIndexOf(".") + 1);
         return newSource(sourceName, url, type, streaming);
     }
 
     @Override
-    public AbstractSource newSource(String sourceName, URL url, String type, boolean streaming) throws LWJALLException {
+    public AbstractSource newSource(String sourceName, URL url, String type, boolean streaming) throws LWJALLException
+    {
         AbstractSource source = null;
         if(streaming)
         {
@@ -254,7 +267,8 @@ public class ALSoundProvider implements ISoundProvider
         return codecManager;
     }
 
-    private IChannel freeChannel() throws LWJALLException {
+    private IChannel freeChannel() throws LWJALLException
+    {
         for(IChannel channel : channels)
         {
             if(channel.hasStopped())
@@ -269,16 +283,15 @@ public class ALSoundProvider implements ISoundProvider
     }
 
     @Override
-    public boolean isPlaying(String sourceName) throws LWJALLException {
+    public boolean isPlaying(String sourceName) throws LWJALLException
+    {
         AbstractSource source = sources.get(sourceName);
-        if(source != null) {
-            return source.getChannel().isPlaying();
-        }
-        return false;
+        return source != null && source.isPlaying();
     }
 
     @Override
-    public void update() throws LWJALLException {
+    public void update() throws LWJALLException
+    {
         for(AbstractSource s : sources.values())
         {
             s.update();
@@ -291,7 +304,9 @@ public class ALSoundProvider implements ISoundProvider
         return supportPitch;
     }
 
-    @Override public void setMasterGain(float gain) throws LWJALLException {
+    @Override
+    public void setMasterGain(float gain) throws LWJALLException
+    {
         this.masterGain = gain;
 
         for(AbstractSource s : sources.values())
@@ -300,7 +315,8 @@ public class ALSoundProvider implements ISoundProvider
         }
     }
 
-    @Override public float getMasterGain()
+    @Override
+    public float getMasterGain()
     {
         return masterGain;
     }

@@ -1,6 +1,7 @@
 package eu.thog92.lwjall.api;
 
 import eu.thog92.lwjall.util.LWJALLException;
+import org.joml.Vector3f;
 
 import java.net.URL;
 
@@ -39,6 +40,18 @@ public interface ISoundProvider
      *            Z element of the up direction.
      */
     void setListenerOrientation(float lookX, float lookY, float lookZ, float upX, float upY, float upZ);
+
+    default void setListenerOrientation(Vector3f look, Vector3f up)
+    {
+        setListenerOrientation(look.x, look.y, look.z, up.x, up.y, up.z);
+    }
+
+    default void setListenerVelocity(Vector3f velocity) throws LWJALLException
+    {
+        setListenerVelocity(velocity.x, velocity.y, velocity.z);
+    }
+
+    void setListenerVelocity(float x, float y, float z);
 
     /**
      * Disposes all resources used by the provider

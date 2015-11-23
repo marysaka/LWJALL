@@ -29,7 +29,7 @@ public class StreamingSource extends AbstractSource
         try
         {
             codec.initialize(url, channel);
-            codec.prepareBuffers(2);
+            codec.prepareBuffers(5);
         }
         catch(Exception e)
         {

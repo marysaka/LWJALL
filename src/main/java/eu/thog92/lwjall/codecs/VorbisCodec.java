@@ -405,7 +405,7 @@ public class VorbisCodec implements ICodec
         for(int i = 0; i < buffersProcessed && !eof; i++ )
         {
             AL10.alSourceUnqueueBuffers(channel.getSource(0));
-            eof = prepareBuffers(1);
+            eof = prepareBuffers(5);
             channel.play();
         }
         if(eof)

@@ -1,6 +1,7 @@
 package eu.thog92.lwjall.api;
 
 import eu.thog92.lwjall.util.LWJALLException;
+import org.joml.Vector3f;
 
 import javax.sound.sampled.AudioFormat;
 import java.nio.ByteBuffer;
@@ -126,7 +127,14 @@ public interface IChannel
      * @param velocity
      *            The new velocity, stored in XYZ order
      */
-    void setVelocity(FloatBuffer velocity) throws LWJALLException;
+    default void setVelocity(Vector3f velocity) throws LWJALLException {
+        setVelocity(velocity.x, velocity.y, velocity.z);
+    }
+
+    /**
+     * Sets the velocity of the sound played by this channel
+     */
+    void setVelocity(float x, float y, float z) throws LWJALLException;
 
     /**
      * Sets the position of the sound played by this channel
@@ -134,7 +142,14 @@ public interface IChannel
      * @param pos
      *            The new position, stored in XYZ order
      */
-    void setPosition(FloatBuffer pos) throws LWJALLException;
+    default void setPosition(Vector3f pos) throws LWJALLException {
+        setPosition(pos.x, pos.y, pos.z);
+    }
+
+    /**
+     * Sets the position of the sound played by this channel
+     */
+    void setPosition(float x, float y, float z) throws LWJALLException;
 
     /**
      * Returns the format of this channel
