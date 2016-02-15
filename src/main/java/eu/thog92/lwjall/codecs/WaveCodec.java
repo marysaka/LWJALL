@@ -8,7 +8,6 @@ import java.nio.ByteBuffer;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.UnsupportedAudioFileException;
 
 import eu.thog92.lwjall.api.AudioBuffer;
 import eu.thog92.lwjall.api.IChannel;

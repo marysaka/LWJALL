@@ -1,6 +1,5 @@
 package eu.thog92.lwjall.codecs;
 
-import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -8,7 +7,6 @@ import java.net.URLConnection;
 import java.nio.ByteBuffer;
 
 import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.UnsupportedAudioFileException;
 
 import com.jcraft.jogg.Packet;
 import com.jcraft.jogg.Page;

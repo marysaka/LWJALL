@@ -2,14 +2,12 @@ package eu.thog92.lwjall.internal;
 
 import eu.thog92.lwjall.api.IChannel;
 import eu.thog92.lwjall.util.LWJALLException;
-import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.openal.AL10;
 import org.lwjgl.openal.AL11;
 
 import javax.sound.sampled.AudioFormat;
 import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
 /**

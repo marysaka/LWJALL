@@ -5,7 +5,6 @@ import org.joml.Vector3f;
 
 import javax.sound.sampled.AudioFormat;
 import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
 
 public interface IChannel
 {

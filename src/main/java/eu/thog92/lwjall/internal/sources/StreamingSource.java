@@ -1,14 +1,11 @@
 package eu.thog92.lwjall.internal.sources;
 
 import eu.thog92.lwjall.api.IChannel;
-import eu.thog92.lwjall.api.ICodecManager;
 import eu.thog92.lwjall.api.AbstractSource;
 import eu.thog92.lwjall.api.ISoundProvider;
 import eu.thog92.lwjall.util.LWJALLException;
 import org.lwjgl.openal.AL10;
 
-import javax.sound.sampled.UnsupportedAudioFileException;
-import java.io.IOException;
 import java.net.URL;
 
 public class StreamingSource extends AbstractSource
