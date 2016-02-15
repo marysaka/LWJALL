@@ -1,6 +1,5 @@
 package eu.thog92.lwjall.tests;
 
-import com.badlogic.SharedLibraryLoader;
 import eu.thog92.lwjall.ALSoundProvider;
 import eu.thog92.lwjall.api.AbstractSource;
 import eu.thog92.lwjall.util.LWJALLException;
@@ -8,7 +7,6 @@ import eu.thog92.lwjall.util.LWJALLException;
 public class TestReading {
 
     public static void main(String[] args) throws LWJALLException {
-        SharedLibraryLoader.load();
         ALSoundProvider provider = new ALSoundProvider();
         boolean streaming = true;
         AbstractSource source = provider.newSource("test", TestReading.class.getResource("/sounds/test.wav"), streaming);

@@ -1,9 +1,7 @@
 package eu.thog92.lwjall.tests;
 
-import java.io.File;
 import java.net.URL;
 
-import com.badlogic.SharedLibraryLoader;
 import eu.thog92.lwjall.ALSoundProvider;
 import eu.thog92.lwjall.api.AbstractSource;
 import eu.thog92.lwjall.api.ISoundProvider;
@@ -12,7 +10,6 @@ public class Main implements Runnable
 {
     public static void main(String[] args)
     {
-        SharedLibraryLoader.load();
         new Thread(new Main()).start();
     }
 
