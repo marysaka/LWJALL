@@ -14,11 +14,9 @@ import eu.thog92.lwjall.internal.sources.StreamingSource;
 import eu.thog92.lwjall.util.LWJALLException;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.openal.*;
-import org.lwjgl.system.MemoryUtil;
 
 import java.net.URL;
 import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

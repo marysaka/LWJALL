@@ -1,5 +1,6 @@
 package eu.thog92.lwjall.util;
 
+@SuppressWarnings("serial")
 public class LWJALLException extends Exception {
 
     public LWJALLException(String message) {
